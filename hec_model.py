@@ -85,9 +85,9 @@ try:
         os.remove(DSS_INPUT_FILE)
         os.remove(DSS_OUTPUT_FILE)
         try:
-            dssvue_cmd = './home/uwcc-admin/udp_150/dssvue/hec-dssvue.sh csv_to_dss_util.py --date {} --time {} --hec-hms-model-dir {}'\
+            dssvue_cmd = '/home/uwcc-admin/udp_150/dssvue/hec-dssvue.sh csv_to_dss_util.py --date {} --time {} --hec-hms-model-dir {}'\
                 .format(run_date, run_time, HEC_HMS_MODEL_DIR)
-            subprocess.call([dssvue_cmd])
+            subprocess.call([dssvue_cmd], shell=True)
             try:
                 update_model_configs()
                 try:
@@ -95,12 +95,14 @@ try:
                     try:
                         model_script = HEC_HMS_MODEL_NAME + '.script'
                         script_file_path = os.path.join(HEC_HMS_MODEL_DIR, HEC_HMS_MODEL_NAME + '.script')
-                        hec_hms_cmd = './home/uwcc-admin/udp_150/hec-hms41/HEC-HMS.sh -s {}'.format(script_file_path)
-                        subprocess.call([hec_hms_cmd])
+                        print("hec-hms script_file_path: ", script_file_path)
+                        hec_hms_cmd = '/home/uwcc-admin/udp_150/hec-hms41/HEC-HMS.sh -s {}'.format(script_file_path)
+                        subprocess.call([hec_hms_cmd], shell=True)
                         try:
-                            dssvue_cmd2 = './home/uwcc-admin/udp_150/dssvue/hec-dssvue.sh dss_to_csv_util.py --date {} --time {} --hec-hms-model-dir{}' \
-                                .format(date, time, HEC_HMS_MODEL_DIR)
-                            subprocess.call([dssvue_cmd2])
+                            print("Hec-Hms has run...")
+                            dssvue_cmd2 = '/home/uwcc-admin/udp_150/dssvue/hec-dssvue.sh dss_to_csv_util.py --date {} --time {} --hec-hms-model-dir {}' \
+                                .format(run_date, run_time, HEC_HMS_MODEL_DIR)
+                            subprocess.call([dssvue_cmd2], shell=True)
                             try:
                                 print('')
                             except Exception as something:

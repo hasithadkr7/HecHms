@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 import collections
 import datetime
 import getopt
@@ -41,10 +39,10 @@ def get_dss_date_time(date_time):
 def update_model_script(model_dir, model_name):
     script_file_path = os.path.join(model_dir, model_name+'.script')
     script_file = open(script_file_path, 'w')
-    script_file.write('from hms.model.JythonHms import *')
-    script_file.write('OpenProject("{}", "{}")'.format(model_name, model_dir))
-    script_file.write('Compute("Run 1")')
-    script_file.write('Exit(1)')
+    script_file.write('from hms.model.JythonHms import *\r\n')
+    script_file.write('OpenProject("{}", "{}")\r\n'.format(model_name, model_dir))
+    script_file.write('Compute("Run 1")\r\n')
+    script_file.write('Exit(1)\r\n')
     script_file.close()
 
 
@@ -123,9 +121,9 @@ def update_model_configs():
         print('Update_HECHMS startTime:', datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
         startDateTime = model_date_time - datetime.timedelta(hours=backward*24)
-        startDateTime = startDateTime.strftime("%Y-%m-%d %H:%M:%S")
+        #startDateTime = startDateTime.strftime("%Y-%m-%d %H:%M:%S")
         endDateTime = model_date_time + datetime.timedelta(hours=(forward*24) - 1)
-        endDateTime = endDateTime.strftime("%Y-%m-%d %H:%M:%S")
+        #endDateTime = endDateTime.strftime("%Y-%m-%d %H:%M:%S")
 
         startDateTimeDSS = get_dss_date_time(startDateTime)
         endDateTimeDSS = get_dss_date_time(endDateTime)

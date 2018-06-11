@@ -2,8 +2,6 @@ import pandas as pd
 import hashlib
 import json
 import traceback
-from pandas.io import sql
-import MySQLdb
 from sqlalchemy import create_engine
 import datetime
 
