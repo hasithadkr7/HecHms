@@ -1,0 +1,27 @@
+{
+    "MYSQL_HOST"        : "104.198.0.87",
+    "MYSQL_USER"        : "root",
+    "MYSQL_PASSWORD"    : "cfcwm07",
+    "MYSQL_DB"          : "curw",
+
+    "RAIN_FALL_DIR"     : "/home/hasitha/Model-Data/HecHms/RainFall",
+    "DISCHARGE_FILE_DIR"     : "/home/hasitha/Model-Data/HecHms/Discharge",
+    "RAIN_CSV_FILE"     : "DailyRain.csv",
+    "DISCHARGE_CSV_FILE" : "DailyDischarge.csv",
+    "CSV_NUM_METADATA_LINES" : 2,
+    "DAT_WIDTH" : 12,
+
+    "INFLOW_DAT_FILE" : "./FLO2D/INFLOW.DAT",
+    "INIT_WL_CONFIG" : "./Template/INITWL.CON",
+
+    "HEC_HMS_MODEL_DIR" : "/home/hasitha/Model-Data/HecHms/Model",
+    "HEC_HMS_MODEL_NAME" : "Model",
+    "HEC_HMS_MODEL_SCRIPT" : "2008_2_Events.script",
+    "HEC_HMS_MODEL_HACK_DIR" : "/home/hasitha/Model-Data/HecHms/ModelHack",
+    "DSS_INPUT_FILE"    : "/home/hasitha/Model-Data/HecHms/Model/2008_2_Events_input.dss",
+    "DSS_OUTPUT_FILE"   : "/home/hasitha/Model-Data/HecHms/Model/2008_2_Events_run.dss",
+    "HEC_HMS_CONTROL"   : "/home/hasitha/Model-Data/HecHms/Model/2008_2_Events/Control_1.control",
+    "HEC_HMS_RUN"       : "/home/hasitha/Model-Data/HecHms/Model/2008_2_Events/2008_2_Events.run",
+    "HEC_HMS_GAGE"      : "/home/hasitha/Model-Data/HecHms/Model/2008_2_Events/2008_2_Events.gage",
+    "TIME_INTERVAL"     : 60
+}

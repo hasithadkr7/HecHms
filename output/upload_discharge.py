@@ -8,7 +8,8 @@ import os
 import sys
 import traceback
 import copy
-from util.db_util import MySqlAdapter
+import pandas as pd
+from util.db_util import MySqlAdapter, get_type_by_date, get_event_id, create_event_id
 
 
 def usage():
@@ -81,68 +82,37 @@ def extract_forecast_timeseries_in_days(timeseries):
     return new_timeseries
 
 
-def save_forecast_timeseries(my_adapter, timeseries, my_model_date, my_model_time, my_opts):
-    print('CSVTODAT:: save_forecast_timeseries:: len', len(timeseries), my_model_date, my_model_time)
-    forecast_timeseries = extract_forecast_timeseries(timeseries, my_model_date, my_model_time, by_day=True)
-    # print(forecastTimeseries[:10])
-    extracted_timeseries = extract_forecast_timeseries_in_days(forecast_timeseries)
-    print('Extracted forecast types # :', len(extracted_timeseries))
+def save_forecast_timeseries(adapter, time_series_data, model_date_time, opts):
+    print('CSVTODAT:: save_forecast_timeseries:: len', len(time_series_data), model_date_time)
+    req_date = datetime.datetime.strptime(model_date_time.strftime("%Y-%m-%d"), '%Y-%m-%d')
+    df = pd.pivot_table(time_series_data, columns=time_series_data['time'].str[:10])
+    days_list = df.columns.values
+    for day in days_list:
+        type = get_type_by_date(req_date, day)
+        sub_df = time_series_data.loc[time_series_data['time'].str[:10] == day]
+        if type != 'Error':
+            meta_data = {
+                'station': 'Hanwella',
+                'variable': 'Discharge',
+                'unit': 'm3/s',
+                'type': type,
+                'source': 'HEC-HMS',
+                'name': opts.get('run_name', 'Cloud-1'),
+            }
+            event_id = get_event_id(adapter, meta_data)
+            if event_id is None:
+                event_id = create_event_id(adapter, meta_data)
+            size = sub_df.shape[0]
 
-    force_insert = my_opts.get('forceInsert', False)
-    my_model_date_time = datetime.datetime.strptime('%s %s' % (my_model_date, my_model_time), '%Y-%m-%d %H:%M:%S')
+            def get_event_column(event_id, size, event_list=[]):
+                for i in range(0, size):
+                    event_list.append(event_id)
+                return event_list
 
-    # TODO: Check whether station exist in Database
-    run_name = my_opts.get('runName', 'Cloud-1')
-    less_char_index = run_name.find('<')
-    greater_char_index = run_name.find('>')
-    # if less_char_index > -1 and greater_char_index > -1 and less_char_index < greater_char_index :
-    if -1 < less_char_index < greater_char_index > -1:
-        start_str = run_name[:less_char_index]
-        date_format_str = run_name[less_char_index + 1:greater_char_index]
-        end_str = run_name[greater_char_index + 1:]
-        try:
-            date_str = my_model_date_time.strftime(date_format_str)
-            run_name = start_str + date_str + end_str
-        except ValueError:
-            raise ValueError("Incorrect data format " + date_format_str)
-    types = [
-        'Forecast-0-d',
-        'Forecast-1-d-after',
-        'Forecast-2-d-after',
-        'Forecast-3-d-after',
-        'Forecast-4-d-after',
-        'Forecast-5-d-after',
-        'Forecast-6-d-after',
-        'Forecast-7-d-after',
-        'Forecast-8-d-after',
-        'Forecast-9-d-after'
-    ]
-    meta_data = {
-        'station': 'Hanwella',
-        'variable': 'Discharge',
-        'unit': 'm3/s',
-        'type': types[0],
-        'source': 'HEC-HMS',
-        'name': run_name,
-    }
-    for index in range(0, min(len(types), len(extracted_timeseries))):
-        meta_data_copy = copy.deepcopy(meta_data)
-        meta_data_copy['type'] = types[index]
-        event_id = my_adapter.get_event_id(meta_data_copy)
-        if event_id is None:
-            event_id = my_adapter.create_event_id(meta_data_copy)
-            print('HASH SHA256 created: ', event_id)
-        else:
-            print('HASH SHA256 exists: ', event_id)
-            if not force_insert:
-                print('Timeseries already exists. User --force to update the existing.\n')
-                continue
+            if size > 0:
+                sub_df.insert(loc=0, column='id', value=get_event_column(event_id, size))
+                print(sub_df)
 
-        # for l in timeseries[:3] + timeseries[-2:] :
-        #     print(l)
-        row_count = my_adapter.insert_timeseries(event_id, extracted_timeseries[index], force_insert)
-        print('%s rows inserted.\n' % row_count)
-    # -- END OF SAVE_FORECAST_TIMESERIES
 
 
 try:
@@ -152,8 +122,6 @@ try:
     DAT_WIDTH = 12
     DISCHARGE_CSV_FILE = 'DailyDischarge.csv'
     DISCHARGE_FILE_DIR = '/HecHms/Discharge'
-    INFLOW_DAT_FILE = './FLO2D/INFLOW.DAT'
-    INIT_WL_CONFIG = './Template/INITWL.CONF'
 
     MYSQL_HOST = "localhost"
     MYSQL_USER = "root"
@@ -162,13 +130,10 @@ try:
 
     if 'DISCHARGE_CSV_FILE' in CONFIG:
         DISCHARGE_CSV_FILE = CONFIG['DISCHARGE_CSV_FILE']
-    if 'INFLOW_DAT_FILE' in CONFIG:
-        INFLOW_DAT_FILE = CONFIG['INFLOW_DAT_FILE']
+    if 'DISCHARGE_FILE_DIR' in CONFIG:
+        DISCHARGE_FILE_DIR = CONFIG['DISCHARGE_FILE_DIR']
     if 'OUTPUT_DIR' in CONFIG:
         OUTPUT_DIR = CONFIG['OUTPUT_DIR']
-    if 'INIT_WL_CONFIG' in CONFIG:
-        INIT_WL_CONFIG = CONFIG['INIT_WL_CONFIG']
-
     if 'MYSQL_HOST' in CONFIG:
         MYSQL_HOST = CONFIG['MYSQL_HOST']
     if 'MYSQL_USER' in CONFIG:
@@ -178,14 +143,13 @@ try:
     if 'MYSQL_PASSWORD' in CONFIG:
         MYSQL_PASSWORD = CONFIG['MYSQL_PASSWORD']
 
-    date = ''
-    time = ''
+    date = '2018-05-30'
+    time = '13:00:00'
     startDate = ''
     startTime = ''
     tag = ''
     forceInsert = False
-    runName = 'Cloud-1'
-
+    runName = 'hec_hms'
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hd:t:T:fn:", [
             "help", "date=", "time=", "start-date=", "start-time=", "tag=", "force", "runName="
@@ -244,17 +208,17 @@ try:
     print(' CSVTODAT run for', date, '@', time, tag)
     print(' With Custom starting', startDate, '@', startTime, ' run name:', runName)
 
-    output_file_dir = os.path.join(DISCHARGE_FILE_DIR,
-                                   datetime.datetime.strptime('%s %s' % (date, time), '%Y-%m-%d_%H:%M:%S'))
+    model_date_time = datetime.datetime.strptime('%s %s' % (date, time), '%Y-%m-%d %H:%M:%S')
+
+    output_file_dir = os.path.join(DISCHARGE_FILE_DIR, model_date_time.strftime("%Y-%m-%d_%H:%M:%S"))
     print("output file dir : ", output_file_dir)
 
     DISCHARGE_CSV_FILE_PATH = os.path.join(output_file_dir, DISCHARGE_CSV_FILE)
     print('Open Discharge CSV ::', DISCHARGE_CSV_FILE_PATH)
-    csvReader = csv.reader(open(DISCHARGE_CSV_FILE_PATH, 'r'), delimiter=',', quotechar='|')
-    csvList = list(csvReader)
+    time_series_data = pd.read_csv(DISCHARGE_CSV_FILE_PATH, names=['time', 'value'])
 
     # Validate Discharge Timeseries
-    if not len(csvList[CSV_NUM_METADATA_LINES:]) > 0:
+    if not time_series_data.shape[0] > 0:
         print('ERROR: Discharge timeseries length is zero.')
         sys.exit(1)
 
@@ -263,8 +227,7 @@ try:
         'forceInsert': forceInsert,
         'runName': runName
     }
-    adapter = MySqlAdapter(host=MYSQL_HOST, user=MYSQL_USER, password=MYSQL_PASSWORD, db=MYSQL_DB)
-    save_forecast_timeseries(adapter, csvList[CSV_NUM_METADATA_LINES:], date, time, opts)
+    save_forecast_timeseries(MySqlAdapter(), time_series_data, model_date_time, opts)
 
 except Exception as e:
     print(e)

@@ -91,9 +91,15 @@ try:
                         hec_hms_cmd = './hec_hms/HEC-HMS.sh -s {}'.format(script_file_path)
                         subprocess.call([hec_hms_cmd])
                         try:
-                            print('')
-                        except Exception as something:
-                            print('')
+                            dssvue_cmd2 = './dssvue/hec-dssvue.sh dss_to_csv_util.py --date {} --time {} --hec-hms-model-dir{}' \
+                                .format(date, time, HEC_HMS_MODEL_DIR)
+                            subprocess.call([dssvue_cmd2])
+                            try:
+                                print('')
+                            except Exception as something:
+                                print('')
+                        except Exception as dssvue_ex:
+                            print("2 Running hec-dssvue.sh exception|Exception|dssvue_ex: ", dssvue_ex)
                     except Exception as hec_hms_ex:
                         print("Running hec-hms.sh exception|Exception|hec_hms_ex: ",hec_hms_ex)
                 except Exception as update_model_script_ex:

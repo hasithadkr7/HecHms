@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-import csv
 import datetime
 import getopt
 import json
@@ -163,14 +162,6 @@ try:
     CONFIG = json.loads(open('/home/hasitha/PycharmProjects/HecHms/config.json').read())
     if 'RAIN_FALL_DIR' in CONFIG:
         RAIN_FALL_DIR = CONFIG['RAIN_FALL_DIR']
-    if 'MYSQL_HOST' in CONFIG:
-        MYSQL_HOST = CONFIG['MYSQL_HOST']
-    if 'MYSQL_USER' in CONFIG:
-        MYSQL_USER = CONFIG['MYSQL_USER']
-    if 'MYSQL_PASSWORD' in CONFIG:
-        MYSQL_PASSWORD = CONFIG['MYSQL_PASSWORD']
-    if 'MYSQL_DB' in CONFIG:
-        MYSQL_DB = CONFIG['MYSQL_DB']
     date = '2018-06-04'
     time = '10:00:00'
     backward = 2
@@ -212,16 +203,15 @@ try:
     klb_forecasted_id2 = 'c48dbb9475ec31b3419bd3dd4206fdff3c53d4d156fa5681ccfa0768e4c39417'  # wrf0, kub_mean, 2-d
 
     # Get Observed Data
-    adapter = MySqlAdapter(host=MYSQL_HOST, user=MYSQL_USER, password=MYSQL_PASSWORD, db=MYSQL_DB)
     data_date = '2018-05-30'
     data_time = '13:00:00'
     model_date_time = datetime.datetime.strptime('%s %s' % (data_date, data_time), '%Y-%m-%d %H:%M:%S')
     print("model_date_time : ", model_date_time)
 
-    kub_time_series = get_kub_mean_timeseries(adapter, model_date_time, kub_observed_id, kub_forecasted_id0,
+    kub_time_series = get_kub_mean_timeseries(MySqlAdapter(), model_date_time, kub_observed_id, kub_forecasted_id0,
                                               kub_forecasted_id1, kub_forecasted_id2, backward)
     kub_rows, kub_columns = kub_time_series.shape
-    klb_time_series = get_klb_mean_timeseries(adapter, model_date_time, klb_forecasted_id0, klb_forecasted_id1,
+    klb_time_series = get_klb_mean_timeseries(MySqlAdapter(), model_date_time, klb_forecasted_id0, klb_forecasted_id1,
                                               klb_forecasted_id2, backward)
     klb_rows, klb_columns = klb_time_series.shape
     if (kub_rows > 0) and (klb_rows > 0):
