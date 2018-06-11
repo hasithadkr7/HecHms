@@ -156,99 +156,95 @@ def get_klb_mean_timeseries(my_adapter, model_date_time, forecasted_id0, forecas
     return newforecasted_timeseries
 
 
-try:
-    RAIN_FALL_DIR = '/HecHms/RainFall'
-    RAIN_CSV_FILE = 'DailyRain.csv'
-    CONFIG = json.loads(open('/home/uwcc-admin/udp_150/HecHms/config.json').read())
-    if 'RAIN_FALL_DIR' in CONFIG:
-        RAIN_FALL_DIR = CONFIG['RAIN_FALL_DIR']
-    date = '2018-06-04'
-    time = '10:00:00'
-    backward = 2
-    forward = 3
+def generate_rf_file(data_date, data_time):
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hd:t:p:f:b:", [
-            "help", "date=", "time=", "path=", "forward=", "backward="
-        ])
-    except getopt.GetoptError:
-        usage()
-        sys.exit(2)
-    for opt, arg in opts:
-        if opt in ("-h", "--help"):
-            usage()
-            sys.exit()
-        elif opt in ("-d", "--date"):  # model run date
-            date = arg
-        elif opt in ("-t", "--time"):  # model run time
-            time = arg
-        elif opt in ("-p", "--path"):
-            RAIN_FALL_DIR = arg
-        elif opt in ("-f", "--backward"):
-            backward = int(arg)
-        elif opt in ("-b", "--forward"):
-            forward = int(arg)
-
-    print("date : ", date)
-    print("time : ", time)
-
-    # Kelani Upper Basin
-    kub_observed_id = 'b0e008522be904bcf71e290b3b0096b33c3e24d9b623dcbe7e58e7d1cc82d0db'
-    kub_forecasted_id0 = 'fb575cb25f1e3d3a07c84513ea6a91c8f2fb98454df1a432518ab98ad7182861'  # wrf0, kub_mean, 0-d
-    kub_forecasted_id1 = '9b18ffa16b251319ad1a931c4e1011b4ce42c874543def69b8a4af76d7b8f9fc'  # wrf0, kub_mean, 1-d
-    kub_forecasted_id2 = 'e0e9cdc2aa4fef7178af08b987f4febc186d19397be744525fb6263815ca5fef'  # wrf0, kub_mean, 2-d
-    # Kelani Lower Basin
-    klb_observed_id = '69c464f749b36d9e55e461947238e7ed809c2033e75ae56234f466eec00aee35'  # wrf0, klb_mean, 0-d
-    klb_forecasted_id0 = '69c464f749b36d9e55e461947238e7ed809c2033e75ae56234f466eec00aee35'  # wrf0, kub_mean, 0-d
-    klb_forecasted_id1 = '35599583ae45d2c0ff93485b8a444da19fabdda8bf8fb539a6d77a0b0819da0a'  # wrf0, kub_mean, 1-d
-    klb_forecasted_id2 = 'c48dbb9475ec31b3419bd3dd4206fdff3c53d4d156fa5681ccfa0768e4c39417'  # wrf0, kub_mean, 2-d
-
-    # Get Observed Data
-    data_date = '2018-05-30'
-    data_time = '13:00:00'
-    model_date_time = datetime.datetime.strptime('%s %s' % (data_date, data_time), '%Y-%m-%d %H:%M:%S')
-    print("model_date_time : ", model_date_time)
-
-    kub_time_series = get_kub_mean_timeseries(MySqlAdapter(), model_date_time, kub_observed_id, kub_forecasted_id0,
-                                              kub_forecasted_id1, kub_forecasted_id2, backward)
-    kub_rows, kub_columns = kub_time_series.shape
-    klb_time_series = get_klb_mean_timeseries(MySqlAdapter(), model_date_time, klb_forecasted_id0, klb_forecasted_id1,
-                                              klb_forecasted_id2, backward)
-    klb_rows, klb_columns = klb_time_series.shape
-    if (kub_rows > 0) and (klb_rows > 0):
-        if kub_rows > klb_rows:
-            max_row_count = klb_rows
-        else:
-            max_row_count = kub_rows
-
-        new_klb_time_series = klb_time_series.head(max_row_count + 1)
-        print("klb : ", new_klb_time_series.shape)
-        new_kub_time_series = kub_time_series.head(max_row_count + 1)
-        print("kub : ", new_kub_time_series.shape)
-        time_series_data = new_kub_time_series.merge(new_klb_time_series, left_on='time', right_on='time', how='left',
-                                                     suffixes=('_kub', '_klb'))
-        time_series_data = time_series_data.sort_values('time')
-
-        ts_start_time = time_series_data.iloc[0]['time']
-        ts_end_time = time_series_data.iloc[-1]['time']
-        time_duration = (backward + forward) * 24
-        ts_actual_end_time = ts_start_time + datetime.timedelta(hours=time_duration-1)
-
-        while ts_end_time < ts_actual_end_time:
-            next_ts_time = ts_end_time + datetime.timedelta(hours=1)
-            next_ts_time = datetime.datetime.strptime(next_ts_time.strftime("%Y-%m-%d %H:%M:%S"), '%Y-%m-%d %H:%M:%S')
-            time_series_data.loc[len(time_series_data)] = [next_ts_time, float(0), float(0)]
-            ts_end_time = time_series_data.iloc[-1]['time']
+        RAIN_FALL_DIR = '/HecHms/RainFall'
+        RAIN_CSV_FILE = 'DailyRain.csv'
+        CONFIG = json.loads(open('/home/uwcc-admin/udp_150/HecHms/config.json').read())
+        if 'RAIN_FALL_DIR' in CONFIG:
+            RAIN_FALL_DIR = CONFIG['RAIN_FALL_DIR']
+        # date = '2018-06-04'
+        # time = '10:00:00'
+        backward = 2
+        forward = 3
         try:
-            print("RAIN_FALL_DIR: ", RAIN_FALL_DIR)
-            output_file_dir = os.path.join(RAIN_FALL_DIR, model_date_time.strftime("%Y-%m-%d_%H:%M:%S"))
-            if not os.path.exists(output_file_dir):
-                os.makedirs(output_file_dir)
-            RAIN_CSV_FILE_PATH = os.path.join(output_file_dir, RAIN_CSV_FILE)
-            time_series_data.to_csv(RAIN_CSV_FILE_PATH, columns=['time', 'value_kub', 'value_klb'],
-                                    encoding='utf-8', header=False, index=False)
-        except IOError as ie:
-            print("get_rain_fall|IOError|ie: ", ie)
-    else:
-        print("**********NO DATA**********")
-except IOError as e:
-    print("get_rain_fall|IOError|e : ", e)
+            opts, args = getopt.getopt(sys.argv[1:], "hd:t:p:f:b:", [
+                "help", "date=", "time=", "path=", "forward=", "backward="
+            ])
+        except getopt.GetoptError:
+            usage()
+            sys.exit(2)
+        for opt, arg in opts:
+            if opt in ("-h", "--help"):
+                usage()
+                sys.exit()
+            elif opt in ("-d", "--date"):  # model run date
+                date = arg
+            elif opt in ("-t", "--time"):  # model run time
+                time = arg
+            elif opt in ("-p", "--path"):
+                RAIN_FALL_DIR = arg
+            elif opt in ("-f", "--backward"):
+                backward = int(arg)
+            elif opt in ("-b", "--forward"):
+                forward = int(arg)
+
+        # Kelani Upper Basin
+        kub_observed_id = 'b0e008522be904bcf71e290b3b0096b33c3e24d9b623dcbe7e58e7d1cc82d0db'
+        kub_forecasted_id0 = 'fb575cb25f1e3d3a07c84513ea6a91c8f2fb98454df1a432518ab98ad7182861'  # wrf0, kub_mean, 0-d
+        kub_forecasted_id1 = '9b18ffa16b251319ad1a931c4e1011b4ce42c874543def69b8a4af76d7b8f9fc'  # wrf0, kub_mean, 1-d
+        kub_forecasted_id2 = 'e0e9cdc2aa4fef7178af08b987f4febc186d19397be744525fb6263815ca5fef'  # wrf0, kub_mean, 2-d
+        # Kelani Lower Basin
+        klb_observed_id = '69c464f749b36d9e55e461947238e7ed809c2033e75ae56234f466eec00aee35'  # wrf0, klb_mean, 0-d
+        klb_forecasted_id0 = '69c464f749b36d9e55e461947238e7ed809c2033e75ae56234f466eec00aee35'  # wrf0, kub_mean, 0-d
+        klb_forecasted_id1 = '35599583ae45d2c0ff93485b8a444da19fabdda8bf8fb539a6d77a0b0819da0a'  # wrf0, kub_mean, 1-d
+        klb_forecasted_id2 = 'c48dbb9475ec31b3419bd3dd4206fdff3c53d4d156fa5681ccfa0768e4c39417'  # wrf0, kub_mean, 2-d
+
+        # Get Observed Data
+        model_date_time = datetime.datetime.strptime('%s %s' % (data_date, data_time), '%Y-%m-%d %H:%M:%S')
+        print("model_date_time : ", model_date_time)
+
+        kub_time_series = get_kub_mean_timeseries(MySqlAdapter(), model_date_time, kub_observed_id, kub_forecasted_id0,
+                                                  kub_forecasted_id1, kub_forecasted_id2, backward)
+        kub_rows, kub_columns = kub_time_series.shape
+        klb_time_series = get_klb_mean_timeseries(MySqlAdapter(), model_date_time, klb_forecasted_id0, klb_forecasted_id1,
+                                                  klb_forecasted_id2, backward)
+        klb_rows, klb_columns = klb_time_series.shape
+        if (kub_rows > 0) and (klb_rows > 0):
+            if kub_rows > klb_rows:
+                max_row_count = klb_rows
+            else:
+                max_row_count = kub_rows
+
+            new_klb_time_series = klb_time_series.head(max_row_count + 1)
+            print("klb : ", new_klb_time_series.shape)
+            new_kub_time_series = kub_time_series.head(max_row_count + 1)
+            print("kub : ", new_kub_time_series.shape)
+            time_series_data = new_kub_time_series.merge(new_klb_time_series, left_on='time', right_on='time', how='left',
+                                                         suffixes=('_kub', '_klb'))
+            time_series_data = time_series_data.sort_values('time')
+
+            ts_start_time = time_series_data.iloc[0]['time']
+            ts_end_time = time_series_data.iloc[-1]['time']
+            time_duration = (backward + forward) * 24
+            ts_actual_end_time = ts_start_time + datetime.timedelta(hours=time_duration-1)
+
+            while ts_end_time < ts_actual_end_time:
+                next_ts_time = ts_end_time + datetime.timedelta(hours=1)
+                next_ts_time = datetime.datetime.strptime(next_ts_time.strftime("%Y-%m-%d %H:%M:%S"), '%Y-%m-%d %H:%M:%S')
+                time_series_data.loc[len(time_series_data)] = [next_ts_time, float(0), float(0)]
+                ts_end_time = time_series_data.iloc[-1]['time']
+            try:
+                print("RAIN_FALL_DIR: ", RAIN_FALL_DIR)
+                output_file_dir = os.path.join(RAIN_FALL_DIR, model_date_time.strftime("%Y-%m-%d_%H:%M:%S"))
+                if not os.path.exists(output_file_dir):
+                    os.makedirs(output_file_dir)
+                RAIN_CSV_FILE_PATH = os.path.join(output_file_dir, RAIN_CSV_FILE)
+                time_series_data.to_csv(RAIN_CSV_FILE_PATH, columns=['time', 'value_kub', 'value_klb'],
+                                        encoding='utf-8', header=False, index=False)
+            except IOError as ie:
+                print("get_rain_fall|IOError|ie: ", ie)
+        else:
+            print("**********NO DATA**********")
+    except IOError as e:
+        print("get_rain_fall|IOError|e : ", e)

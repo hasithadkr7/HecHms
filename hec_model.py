@@ -1,10 +1,12 @@
 import json
 import shutil
+from distutils.dir_util import copy_tree
 import os
 import subprocess
 import getopt
 import sys
 from model_update_util import update_model_configs, update_model_script
+from get_rain_fall import generate_rf_file
 
 
 def usage():
@@ -68,18 +70,23 @@ try:
             usage()
             sys.exit()
         elif opt in ("-d", "--date"):  # model run date
-            date = arg
+            run_date = arg
         elif opt in ("-t", "--time"):  # model run time
-            time = arg
+            run_time = arg
         elif opt in ("-b", "--backward"):
             backward = int(arg)
     try:
-        shutil.copytree(HEC_HMS_MODEL_HACK_DIR, HEC_HMS_MODEL_DIR)
+        try:
+            generate_rf_file(run_date, run_time)
+        except Exception as rf_ex:
+            print("generate_rf_file|Exception|rf_ex : ", rf_ex)
+            sys.exit()
+        copy_tree(HEC_HMS_MODEL_HACK_DIR, HEC_HMS_MODEL_DIR)
         os.remove(DSS_INPUT_FILE)
         os.remove(DSS_OUTPUT_FILE)
         try:
-            dssvue_cmd = './home/uwcc-admin/udp_150/dssvue/hec-dssvue.sh csv_to_dss_util.py --date {} --time {} --hec-hms-model-dir{}'\
-                .format(date, time, HEC_HMS_MODEL_DIR)
+            dssvue_cmd = './home/uwcc-admin/udp_150/dssvue/hec-dssvue.sh csv_to_dss_util.py --date {} --time {} --hec-hms-model-dir {}'\
+                .format(run_date, run_time, HEC_HMS_MODEL_DIR)
             subprocess.call([dssvue_cmd])
             try:
                 update_model_configs()
