@@ -20,7 +20,7 @@ Usage: ./CSVTODAT.py [-d YYYY-MM-DD] [-t HH:MM:SS] [-h]
 
 
 try:
-    CONFIG = json.loads(open('/home/hasitha/PycharmProjects/HecHms/config.json').read())
+    CONFIG = json.loads(open('/home/uwcc-admin/udp_150/HecHms/config.json').read())
     RAIN_FALL_DIR = ''
     HEC_HMS_MODEL_DIR = ''
     HEC_HMS_MODEL_HACK_DIR = ''
@@ -78,7 +78,7 @@ try:
         os.remove(DSS_INPUT_FILE)
         os.remove(DSS_OUTPUT_FILE)
         try:
-            dssvue_cmd = './dssvue/hec-dssvue.sh csv_to_dss_util.py --date {} --time {} --hec-hms-model-dir{}'\
+            dssvue_cmd = './home/uwcc-admin/udp_150/dssvue/hec-dssvue.sh csv_to_dss_util.py --date {} --time {} --hec-hms-model-dir{}'\
                 .format(date, time, HEC_HMS_MODEL_DIR)
             subprocess.call([dssvue_cmd])
             try:
@@ -88,10 +88,10 @@ try:
                     try:
                         model_script = HEC_HMS_MODEL_NAME + '.script'
                         script_file_path = os.path.join(HEC_HMS_MODEL_DIR, HEC_HMS_MODEL_NAME + '.script')
-                        hec_hms_cmd = './hec_hms/HEC-HMS.sh -s {}'.format(script_file_path)
+                        hec_hms_cmd = './home/uwcc-admin/udp_150/hec-hms41/HEC-HMS.sh -s {}'.format(script_file_path)
                         subprocess.call([hec_hms_cmd])
                         try:
-                            dssvue_cmd2 = './dssvue/hec-dssvue.sh dss_to_csv_util.py --date {} --time {} --hec-hms-model-dir{}' \
+                            dssvue_cmd2 = './home/uwcc-admin/udp_150/dssvue/hec-dssvue.sh dss_to_csv_util.py --date {} --time {} --hec-hms-model-dir{}' \
                                 .format(date, time, HEC_HMS_MODEL_DIR)
                             subprocess.call([dssvue_cmd2])
                             try:

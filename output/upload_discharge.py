@@ -116,7 +116,7 @@ def save_forecast_timeseries(adapter, time_series_data, model_date_time, opts):
 
 
 try:
-    CONFIG = json.loads(open('/home/hasitha/PycharmProjects/HecHms/config.json').read())
+    CONFIG = json.loads(open('/home/uwcc-admin/udp_150/HecHms/config.json').read())
 
     CSV_NUM_METADATA_LINES = 2
     DAT_WIDTH = 12

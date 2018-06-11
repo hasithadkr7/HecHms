@@ -10,7 +10,7 @@ import datetime
 
 class MySqlAdapter:
     def __init__(self):
-        CONFIG = json.loads(open('/home/hasitha/PycharmProjects/HecHms/config.json').read())
+        CONFIG = json.loads(open('/home/uwcc-admin/udp_150/HecHms/config.json').read())
         if 'MYSQL_HOST' in CONFIG:
             MYSQL_HOST = CONFIG['MYSQL_HOST']
         if 'MYSQL_USER' in CONFIG:

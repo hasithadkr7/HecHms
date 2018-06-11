@@ -19,7 +19,7 @@ try:
         print
         'Jython version: ', sys.version
 
-        CONFIG = json.loads(open('config.json').read())
+        CONFIG = json.loads(open('/home/uwcc-admin/udp_150/HecHms/config.json').read())
         # print('Config :: ', CONFIG)
 
         NUM_METADATA_LINES = 0;

@@ -50,7 +50,7 @@ def update_model_script(model_dir, model_name):
 
 def update_model_configs():
     try:
-        CONFIG = json.loads(open('/home/hasitha/PycharmProjects/HecHms/config.json').read())
+        CONFIG = json.loads(open('/home/uwcc-admin/udp_150/HecHms/config.json').read())
         # print('Config :: ', CONFIG)
 
         HEC_HMS_MODEL_DIR = './2008_2_Events'

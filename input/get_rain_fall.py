@@ -159,7 +159,7 @@ def get_klb_mean_timeseries(my_adapter, model_date_time, forecasted_id0, forecas
 try:
     RAIN_FALL_DIR = '/HecHms/RainFall'
     RAIN_CSV_FILE = 'DailyRain.csv'
-    CONFIG = json.loads(open('/home/hasitha/PycharmProjects/HecHms/config.json').read())
+    CONFIG = json.loads(open('/home/uwcc-admin/udp_150/HecHms/config.json').read())
     if 'RAIN_FALL_DIR' in CONFIG:
         RAIN_FALL_DIR = CONFIG['RAIN_FALL_DIR']
     date = '2018-06-04'

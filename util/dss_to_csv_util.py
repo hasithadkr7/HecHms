@@ -17,7 +17,7 @@ try:
         print
         'Jython version: ', sys.version
 
-        CONFIG = json.loads(open('config.json').read())
+        CONFIG = json.loads(open('/home/uwcc-admin/udp_150/HecHms/config.json').read())
         # print('Config :: ', CONFIG)
         HEC_HMS_MODEL_DIR = './2008_2_Events'
         DSS_OUTPUT_FILE = './2008_2_Events/2008_2_Events.dss'
