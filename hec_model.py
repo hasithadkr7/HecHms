@@ -4,7 +4,7 @@ import os
 import subprocess
 import getopt
 import sys
-from util.model_update_util import update_model_configs, update_model_script
+from model_update_util import update_model_configs, update_model_script
 
 
 def usage():

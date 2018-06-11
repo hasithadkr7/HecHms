@@ -7,7 +7,7 @@ import pandas as pd
 import os
 import sys
 from decimal import *
-from util.db_util import MySqlAdapter, get_time_series_values
+from db_util import MySqlAdapter, get_time_series_values
 
 
 def usage():

@@ -7,9 +7,8 @@ import json
 import os
 import sys
 import traceback
-import copy
 import pandas as pd
-from util.db_util import MySqlAdapter, get_type_by_date, get_event_id, create_event_id
+from db_util import MySqlAdapter, get_type_by_date, get_event_id, create_event_id
 
 
 def usage():
