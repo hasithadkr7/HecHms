@@ -22,7 +22,7 @@ try:
         CONFIG = json.loads(open('/home/uwcc-admin/udp_150/HecHms/config.json').read())
         # print('Config :: ', CONFIG)
 
-        NUM_METADATA_LINES = 3;
+        NUM_METADATA_LINES = 0;
         HEC_HMS_MODEL_DIR = './2008_2_Events'
         DSS_INPUT_FILE = './2008_2_Events/2008_2_Events_force.dss'
         RAIN_CSV_FILE = 'DailyRain.csv'
@@ -102,22 +102,19 @@ try:
         'Location Ids :', locationIds
 
         for i in range(0, numLocations):
-            print
-            '\n>>>>>>> Start processing ', locationIds[i], '<<<<<<<<<<<<'
+            print '\n>>>>>>> Start processing ', locationIds[i], '<<<<<<<<<<<<'
             precipitations = []
             for j in range(NUM_METADATA_LINES, numValues + NUM_METADATA_LINES):
                 p = float(csvList[j][i + 1])
                 precipitations.append(p)
 
-            print
-            'Precipitation of ', locationIds[i], precipitations[:10]
+            print 'Precipitation of ', locationIds[i], precipitations[:10]
             tsc = TimeSeriesContainer()
             # tsc.fullName = "/BASIN/LOC/FLOW//1HOUR/OBS/"
             # tsc.fullName = '//' + locationIds[i].upper() + '/PRECIP-INC//1DAY/GAGE/'
             tsc.fullName = '//' + locationIds[i].upper() + '/PRECIP-INC//1HOUR/GAGE/'
 
-            print
-            'Start time : ', csvList[NUM_METADATA_LINES][0]
+            print 'Start time : ', csvList[NUM_METADATA_LINES][0]
             start = HecTime(csvList[NUM_METADATA_LINES][0])
             tsc.interval = 60  # in minutes
             times = []

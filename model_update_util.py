@@ -46,7 +46,7 @@ def update_model_script(model_dir, model_name):
     script_file.close()
 
 
-def update_model_configs():
+def update_model_configs(date, time, backward=2, forward=3):
     try:
         CONFIG = json.loads(open('/home/uwcc-admin/udp_150/HecHms/config.json').read())
         # print('Config :: ', CONFIG)
@@ -73,50 +73,7 @@ def update_model_configs():
         if 'TIME_INTERVAL' in CONFIG :
             TIME_INTERVAL = CONFIG['TIME_INTERVAL']
 
-        date = ''
-        time = ''
-        backward = 2
-        forward = 3
-
-        try:
-            opts, args = getopt.getopt(sys.argv[1:], "hd:t:f:b:", [
-                "help", "date=", "time=", "backward=", "forward=", "hec-hms-model-dir="
-            ])
-        except getopt.GetoptError:
-            usage()
-            sys.exit(2)
-        for opt, arg in opts:
-            if opt in ("-h", "--help"):
-                usage()
-                sys.exit(0)
-            elif opt in ("-d", "--date"):
-                date = arg
-            elif opt in ("-t", "--time"):
-                time = arg
-            elif opt in ("-b", "--backward"):
-                backward = int(arg)
-            elif opt in ("-f", "--forward"):
-                forward = int(arg)
-            elif opt in "--hec-hms-model-dir":
-                HEC_HMS_MODEL_DIR = arg
-
         model_date_time = datetime.datetime.strptime('%s %s' % (date, time), '%Y-%m-%d %H:%M:%S')
-
-        # Replace CONFIG.json variables
-        if re.match('^\$\{(HEC_HMS_MODEL_DIR)\}', HEC_HMS_CONTROL):
-            HEC_HMS_CONTROL = re.sub('^\$\{(HEC_HMS_MODEL_DIR)\}', '', HEC_HMS_CONTROL).strip("/\\")
-            HEC_HMS_CONTROL = os.path.join(HEC_HMS_MODEL_DIR, HEC_HMS_CONTROL)
-            print('Set HEC_HMS_CONTROL=', HEC_HMS_CONTROL)
-
-        if re.match('^\$\{(HEC_HMS_MODEL_DIR)\}', HEC_HMS_RUN):
-            HEC_HMS_RUN = re.sub('^\$\{(HEC_HMS_MODEL_DIR)\}', '', HEC_HMS_RUN).strip("/\\")
-            HEC_HMS_RUN = os.path.join(HEC_HMS_MODEL_DIR, HEC_HMS_RUN)
-            print('Set HEC_HMS_RUN=', HEC_HMS_RUN)
-
-        if re.match('^\$\{(HEC_HMS_MODEL_DIR)\}', HEC_HMS_GAGE):
-            HEC_HMS_GAGE = re.sub('^\$\{(HEC_HMS_MODEL_DIR)\}', '', HEC_HMS_GAGE).strip("/\\")
-            HEC_HMS_GAGE = os.path.join(HEC_HMS_MODEL_DIR, HEC_HMS_GAGE)
-            print('Set HEC_HMS_GAGE=', HEC_HMS_GAGE)
 
         print('Update_HECHMS startTime:', datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
@@ -124,7 +81,8 @@ def update_model_configs():
         #startDateTime = startDateTime.strftime("%Y-%m-%d %H:%M:%S")
         endDateTime = model_date_time + datetime.timedelta(hours=(forward*24) - 1)
         #endDateTime = endDateTime.strftime("%Y-%m-%d %H:%M:%S")
-
+        print("--------------------startDateTime : ", startDateTime)
+        print("--------------------endDateTime : ", endDateTime)
         startDateTimeDSS = get_dss_date_time(startDateTime)
         endDateTimeDSS = get_dss_date_time(endDateTime)
         startDate = startDateTimeDSS.date

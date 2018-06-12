@@ -88,7 +88,7 @@ try:
                 .format(run_date, run_time, HEC_HMS_MODEL_DIR)
             subprocess.call([dssvue_cmd], shell=True)
             try:
-                update_model_configs()
+                update_model_configs(run_date, run_time)
                 try:
                     update_model_script(HEC_HMS_MODEL_DIR, HEC_HMS_MODEL_NAME)
                     try:
