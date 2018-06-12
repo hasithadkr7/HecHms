@@ -18,7 +18,7 @@ try:
         'Jython version: ', sys.version
 
         CONFIG = json.loads(open('/home/uwcc-admin/udp_150/HecHms/config.json').read())
-        # print('Config :: ', CONFIG)
+        #print('Config :: ', CONFIG)
         HEC_HMS_MODEL_DIR = './2008_2_Events'
         DSS_OUTPUT_FILE = './2008_2_Events/2008_2_Events.dss'
         DISCHARGE_CSV_FILE = 'DailyDischarge.csv'
@@ -30,8 +30,8 @@ try:
             DSS_OUTPUT_FILE = CONFIG['DSS_OUTPUT_FILE']
         if 'DISCHARGE_CSV_FILE' in CONFIG:
             DISCHARGE_CSV_FILE = CONFIG['DISCHARGE_CSV_FILE']
-        if 'DISCHARGE_DIR' in CONFIG:
-            DISCHARGE_DIR = CONFIG['DISCHARGE_DIR']
+        if 'DISCHARGE_FILE_DIR' in CONFIG:
+            DISCHARGE_DIR = CONFIG['DISCHARGE_FILE_DIR']
 
         date = ''
         time = ''
@@ -54,26 +54,15 @@ try:
             date = options.date
         if options.time:
             time = options.time
-        if options.hec_hms_model_dir:
-            HEC_HMS_MODEL_DIR = options.hec_hms_model_dir
-            # Reconstruct DSS_OUTPUT_FILE path
-            dssFileName = DSS_OUTPUT_FILE.rsplit('/', 1)
-            DSS_OUTPUT_FILE = os.path.join(HEC_HMS_MODEL_DIR, dssFileName[-1])
-
-        # Replace CONFIG.json variables
-        if re.match('^\$\{(HEC_HMS_MODEL_DIR)\}', DSS_OUTPUT_FILE):
-            DSS_OUTPUT_FILE = re.sub('^\$\{(HEC_HMS_MODEL_DIR)\}', '', DSS_OUTPUT_FILE).strip("/\\")
-            DSS_OUTPUT_FILE = os.path.join(HEC_HMS_MODEL_DIR, DSS_OUTPUT_FILE)
-            print
-            '"Set DSS_OUTPUT_FILE=', DSS_OUTPUT_FILE
-
         # Default run for current day
         model_date_time = datetime.datetime.strptime('%s %s' % (date, time), '%Y-%m-%d %H:%M:%S')
-        model_date_dir = model_date_time.strftime('%Y-%m-%d %H:%M:%S')
+        model_date_dir = model_date_time.strftime('%Y-%m-%d_%H:%M:%S')
         myDss = HecDss.open(DSS_OUTPUT_FILE)
+        output_file_dir = os.path.join(DISCHARGE_DIR, model_date_dir)
         DISCHARGE_CSV_FILE_PATH = os.path.join(DISCHARGE_DIR, model_date_dir+'/'+DISCHARGE_CSV_FILE)
-        print
-        'Open Discharge CSV ::', DISCHARGE_CSV_FILE_PATH
+        if not os.path.exists(output_file_dir):
+            os.makedirs(output_file_dir)
+        print 'Open Discharge CSV ::', DISCHARGE_CSV_FILE_PATH
         csvWriter = csv.writer(open(DISCHARGE_CSV_FILE_PATH, 'w'), delimiter=',', quotechar='|')
 
         flow = myDss.get('//HANWELLA/FLOW//1HOUR/RUN:RUN 1/', 1)
