@@ -22,7 +22,7 @@ try:
         CONFIG = json.loads(open('/home/uwcc-admin/udp_150/HecHms/config.json').read())
         # print('Config :: ', CONFIG)
 
-        NUM_METADATA_LINES = 0;
+        NUM_METADATA_LINES = 3;
         HEC_HMS_MODEL_DIR = './2008_2_Events'
         DSS_INPUT_FILE = './2008_2_Events/2008_2_Events_force.dss'
         RAIN_CSV_FILE = 'DailyRain.csv'

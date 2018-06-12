@@ -4,6 +4,7 @@ import json
 import pandas as pd
 import os
 import sys
+import csv
 from decimal import *
 from db_util import MySqlAdapter, get_time_series_values
 
@@ -238,6 +239,10 @@ def generate_rf_file(data_date, data_time):
                 if not os.path.exists(output_file_dir):
                     os.makedirs(output_file_dir)
                 RAIN_CSV_FILE_PATH = os.path.join(output_file_dir, RAIN_CSV_FILE)
+                csvWriter = csv.writer(open(RAIN_CSV_FILE_PATH, 'w'), delimiter=',', quotechar='|')
+                csvWriter.writerow(['Location Names', 'Awissawella', 'Colombo'])
+                csvWriter.writerow(['Location Ids', 'Awissawella', 'Colombo'])
+                csvWriter.writerow(['Time', 'Rainfall', 'Rainfall'])
                 time_series_data.to_csv(RAIN_CSV_FILE_PATH, columns=['time', 'value_kub', 'value_klb'],
                                         encoding='utf-8', header=False, index=False)
             except IOError as ie:
