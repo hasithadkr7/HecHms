@@ -90,10 +90,10 @@ try:
         'Open Rainfall CSV ::', RAIN_CSV_FILE_PATH
         csvReader = csv.reader(open(RAIN_CSV_FILE_PATH, 'r'), delimiter=',', quotechar='|')
         csvList = list(csvReader)
-
-        numLocations = len(csvList[0]) - 1
-        numValues = len(csvList) - NUM_METADATA_LINES  # Ignore Metadata
-        locationIds = csvList[1][1:]
+        numLocationList = ['Location Names','Awissawella','Colombo']
+        numLocations = len(numLocationList) - 1
+        numValues = len(csvList)  # Ignore Metadata
+        locationIds = ['Awissawella','Colombo']
         print
         'Start reading', numLocations, csvList[0][0], ':', ', '.join(csvList[0][1:])
         print

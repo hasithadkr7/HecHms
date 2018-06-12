@@ -239,11 +239,6 @@ def generate_rf_file(data_date, data_time):
                 if not os.path.exists(output_file_dir):
                     os.makedirs(output_file_dir)
                 RAIN_CSV_FILE_PATH = os.path.join(output_file_dir, RAIN_CSV_FILE)
-                rain_file = open(RAIN_CSV_FILE_PATH, 'w')
-                rain_file.write('Location Names,Awissawella,Colombo\r\n')
-                rain_file.write('Location Ids,Awissawella,Colombo\r\n')
-                rain_file.write('Time,Rainfall,Rainfall\r\n')
-                rain_file.close()
                 time_series_data.to_csv(RAIN_CSV_FILE_PATH, columns=['time', 'value_kub', 'value_klb'],
                                         encoding='utf-8', header=False, index=False)
             except IOError as ie:
