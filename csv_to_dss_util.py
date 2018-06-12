@@ -3,7 +3,7 @@
 # Rainfall CSV file format should follow as
 # https://publicwiki.deltares.nl/display/FEWSDOC/CSV
 
-import java, csv, sys, datetime, re
+import java, csv, sys, datetime, os
 from hec.script import MessageBox
 from hec.heclib.dss import HecDss
 from hec.heclib.util import HecTime
@@ -83,6 +83,8 @@ try:
         myDss = HecDss.open(DSS_INPUT_FILE)
 
         output_file_dir = os.path.join(RAIN_FALL_DIR, modelState.strftime("%Y-%m-%d_%H:%M:%S"))
+        if not os.path.exists(output_file_dir):
+            os.makedirs(output_file_dir)
         RAIN_CSV_FILE_PATH = os.path.join(output_file_dir, RAIN_CSV_FILE)
         print
         'Open Rainfall CSV ::', RAIN_CSV_FILE_PATH
