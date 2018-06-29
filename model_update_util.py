@@ -37,6 +37,8 @@ def get_dss_date_time(date_time):
 
 
 def update_model_script(model_dir, model_name):
+    rel_path = os.path.relpath('/home/uwcc-admin/udp_150/2008_2_Events', 'hec-hms41')
+    print("--------------------rel_path: ",rel_path)
     script_file_path = os.path.join(model_dir, model_name+'.script')
     script_file = open(script_file_path, 'w')
     script_file.write('from hms.model.JythonHms import *\r\n')
@@ -46,22 +48,18 @@ def update_model_script(model_dir, model_name):
     script_file.close()
 
 
-def update_model_configs(date, time, backward=2, forward=3):
+def update_model_configs(date, time, backward=2, forward=3, init_state=False):
     try:
         CONFIG = json.loads(open('/home/uwcc-admin/udp_150/HecHms/config.json').read())
         # print('Config :: ', CONFIG)
 
-        HEC_HMS_MODEL_DIR = './2008_2_Events'
         HEC_HMS_CONTROL = './2008_2_Events/Control_1.control'
         HEC_HMS_RUN = './2008_2_Events/2008_2_Events.run'
         HEC_HMS_GAGE = './2008_2_Events/2008_2_Events.gage'
-        RAIN_CSV_FILE = 'DailyRain.csv'
         TIME_INTERVAL = 60  # In minutes
         STATE_INTERVAL = 1 * 24 * 60  # In minutes (1 day)
         CONTROL_INTERVAL = 8 * 24 * 60  # In minutes (8 day)
 
-        if 'HEC_HMS_MODEL_DIR' in CONFIG :
-            HEC_HMS_MODEL_DIR = CONFIG['HEC_HMS_MODEL_DIR']
         if 'HEC_HMS_CONTROL' in CONFIG :
             HEC_HMS_CONTROL = CONFIG['HEC_HMS_CONTROL']
         if 'HEC_HMS_RUN' in CONFIG :
@@ -149,8 +147,9 @@ def update_model_configs(date, time, backward=2, forward=3):
                 line2 = indent + 'Save State Date: ' + saveStateDateTimeDSS.date
                 line3 = indent + 'Save State Time: ' + saveStateDateTimeDSS.time
                 runFile.write(line1 + '\n'); runFile.write(line2 + '\n'); runFile.write(line3 + '\n')
-                line4 = indent + 'Start State Name: State_' + startStateDateTime.strftime('%Y_%m_%d') + '_To_' + startDateTime.strftime('%Y_%m_%d')
-                runFile.write(line4 + '\n')
+                if init_state==True:
+                    line4 = indent + 'Start State Name: State_' + startStateDateTime.strftime('%Y_%m_%d') + '_To_' + startDateTime.strftime('%Y_%m_%d')
+                    runFile.write(line4 + '\n')
 
             # Skip Writing these lines
             elif 'Save State At End of Run:' in line:

@@ -32,6 +32,7 @@ try:
     backward = 2
     forecast_date = ''
     forecast_time = ''
+    init_state = False
 
     if 'RAIN_FALL_DIR' in CONFIG:
         RAIN_FALL_DIR = CONFIG['RAIN_FALL_DIR']
@@ -58,8 +59,8 @@ try:
         MYSQL_PASSWORD = CONFIG['MYSQL_PASSWORD']
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hd:t:p:f:b:", [
-            "help", "date=", "time=", "path=", "forward=", "backward="
+        opts, args = getopt.getopt(sys.argv[1:], "hd:t:p:f:b:i:", [
+            "help", "date=", "time=", "path=", "forward=", "init=", "backward="
         ])
     except getopt.GetoptError:
         usage()
@@ -74,6 +75,8 @@ try:
             run_time = arg
         elif opt in ("-b", "--backward"):
             backward = int(arg)
+        elif opt in ("-i", "--init"):
+            init_state = True
     try:
         try:
             generate_rf_file(run_date, run_time)
@@ -88,7 +91,7 @@ try:
                 .format(run_date, run_time, HEC_HMS_MODEL_DIR)
             subprocess.call([dssvue_cmd], shell=True)
             try:
-                update_model_configs(run_date, run_time)
+                update_model_configs(run_date, run_time, init_state)
                 try:
                     update_model_script(HEC_HMS_MODEL_DIR, HEC_HMS_MODEL_NAME)
                     try:

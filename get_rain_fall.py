@@ -155,7 +155,7 @@ def get_klb_mean_timeseries(my_adapter, model_date_time, forecasted_id0, forecas
     return newforecasted_timeseries
 
 
-def generate_rf_file(data_date, data_time):
+def generate_rf_file(data_date, data_time, backward=2, forward=3):
     try:
         RAIN_FALL_DIR = '/HecHms/RainFall'
         RAIN_CSV_FILE = 'DailyRain.csv'
@@ -164,8 +164,7 @@ def generate_rf_file(data_date, data_time):
             RAIN_FALL_DIR = CONFIG['RAIN_FALL_DIR']
         # date = '2018-06-04'
         # time = '10:00:00'
-        backward = 2
-        forward = 3
+
         try:
             opts, args = getopt.getopt(sys.argv[1:], "hd:t:p:f:b:", [
                 "help", "date=", "time=", "path=", "forward=", "backward="
@@ -183,10 +182,6 @@ def generate_rf_file(data_date, data_time):
                 time = arg
             elif opt in ("-p", "--path"):
                 RAIN_FALL_DIR = arg
-            elif opt in ("-f", "--backward"):
-                backward = int(arg)
-            elif opt in ("-b", "--forward"):
-                forward = int(arg)
 
         # Kelani Upper Basin
         kub_observed_id = 'b0e008522be904bcf71e290b3b0096b33c3e24d9b623dcbe7e58e7d1cc82d0db'

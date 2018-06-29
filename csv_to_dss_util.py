@@ -24,7 +24,7 @@ try:
 
         NUM_METADATA_LINES = 0;
         HEC_HMS_MODEL_DIR = './2008_2_Events'
-        DSS_INPUT_FILE = './2008_2_Events/2008_2_Events_force.dss'
+        DSS_INPUT_FILE = './2008_2_Events/2008_2_Events_input.dss'
         RAIN_CSV_FILE = 'DailyRain.csv'
         RAIN_FALL_DIR = '/HecHms/RainFall'
 
