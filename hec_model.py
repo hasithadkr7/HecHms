@@ -76,7 +76,9 @@ try:
         elif opt in ("-b", "--backward"):
             backward = int(arg)
         elif opt in ("-i", "--init"):
-            init_state = True
+            init = int(arg)
+            if init ==1:
+                init_state = True
     try:
         try:
             generate_rf_file(run_date, run_time)
@@ -98,8 +100,9 @@ try:
                         model_script = HEC_HMS_MODEL_NAME + '.script'
                         script_file_path = os.path.join(HEC_HMS_MODEL_DIR, HEC_HMS_MODEL_NAME + '.script')
                         print("hec-hms script_file_path: ", script_file_path)
-                        hec_hms_cmd = '/home/uwcc-admin/udp_150/hec-hms41/HEC-HMS.sh -s {}'.format(script_file_path)
-                        subprocess.call([hec_hms_cmd], shell=True)
+                        #hec_hms_cmd = '/home/uwcc-admin/udp_150/hec-hms41/HEC-HMS.sh -s {}'.format(script_file_path)
+                        #subprocess.call([hec_hms_cmd], shell=True)
+                        os.system('./run_hec.sh')
                         try:
                             print("Hec-Hms has run...")
                             dssvue_cmd2 = '/home/uwcc-admin/udp_150/dssvue/hec-dssvue.sh dss_to_csv_util.py --date {} --time {} --hec-hms-model-dir {}' \

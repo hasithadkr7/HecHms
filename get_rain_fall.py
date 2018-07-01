@@ -92,7 +92,7 @@ def get_forecasted_timeseries1(my_adapter, model_date_time, forecasted_id0, fore
 
 def get_forecasted_timeseries(adapter, model_date_time, forecasted_id0, forecasted_id1,
                               forecasted_id2):  # eg: 2018-05-22 21:00:00
-    forecast_d0_start = model_date_time - datetime.timedelta(hours=48)
+    forecast_d0_start = model_date_time - datetime.timedelta(hours=48,minutes=90)
     forecast_d0_end = model_date_time + datetime.timedelta(hours=0)
     forecast_d0_end = forecast_d0_end.strftime("%Y-%m-%d 23:00:00")
     forecast_d0_timeseries = get_time_series_values(adapter, forecasted_id0,
@@ -127,7 +127,7 @@ def get_forecasted_timeseries(adapter, model_date_time, forecasted_id0, forecast
 
 
 def get_observed_timeseries(adapter, model_date_time, observed_id, backward):
-    observed_start = model_date_time - datetime.timedelta(hours=backward*24)
+    observed_start = model_date_time - datetime.timedelta(hours=backward*24, minutes=90)
     observed_end = model_date_time
     observed_timeseries = get_time_series_values(adapter, observed_id, observed_start.strftime("%Y-%m-%d %H:%M:%S"),
                                                  observed_end.strftime("%Y-%m-%d %H:%M:%S"))
@@ -164,25 +164,6 @@ def generate_rf_file(data_date, data_time, backward=2, forward=3):
             RAIN_FALL_DIR = CONFIG['RAIN_FALL_DIR']
         # date = '2018-06-04'
         # time = '10:00:00'
-
-        try:
-            opts, args = getopt.getopt(sys.argv[1:], "hd:t:p:f:b:", [
-                "help", "date=", "time=", "path=", "forward=", "backward="
-            ])
-        except getopt.GetoptError:
-            usage()
-            sys.exit(2)
-        for opt, arg in opts:
-            if opt in ("-h", "--help"):
-                usage()
-                sys.exit()
-            elif opt in ("-d", "--date"):  # model run date
-                date = arg
-            elif opt in ("-t", "--time"):  # model run time
-                time = arg
-            elif opt in ("-p", "--path"):
-                RAIN_FALL_DIR = arg
-
         # Kelani Upper Basin
         kub_observed_id = 'b0e008522be904bcf71e290b3b0096b33c3e24d9b623dcbe7e58e7d1cc82d0db'
         kub_forecasted_id0 = 'fb575cb25f1e3d3a07c84513ea6a91c8f2fb98454df1a432518ab98ad7182861'  # wrf0, kub_mean, 0-d

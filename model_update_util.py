@@ -48,7 +48,7 @@ def update_model_script(model_dir, model_name):
     script_file.close()
 
 
-def update_model_configs(date, time, backward=2, forward=3, init_state=False):
+def update_model_configs(date, time, init_state=False, backward=2, forward=3):
     try:
         CONFIG = json.loads(open('/home/uwcc-admin/udp_150/HecHms/config.json').read())
         # print('Config :: ', CONFIG)
@@ -75,7 +75,7 @@ def update_model_configs(date, time, backward=2, forward=3, init_state=False):
 
         print('Update_HECHMS startTime:', datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
-        startDateTime = model_date_time - datetime.timedelta(hours=backward*24)
+        startDateTime = model_date_time - datetime.timedelta(hours=(backward*24)+1)
         #startDateTime = startDateTime.strftime("%Y-%m-%d %H:%M:%S")
         endDateTime = model_date_time + datetime.timedelta(hours=(forward*24) - 1)
         #endDateTime = endDateTime.strftime("%Y-%m-%d %H:%M:%S")
@@ -147,7 +147,7 @@ def update_model_configs(date, time, backward=2, forward=3, init_state=False):
                 line2 = indent + 'Save State Date: ' + saveStateDateTimeDSS.date
                 line3 = indent + 'Save State Time: ' + saveStateDateTimeDSS.time
                 runFile.write(line1 + '\n'); runFile.write(line2 + '\n'); runFile.write(line3 + '\n')
-                if init_state==True:
+                if not init_state:
                     line4 = indent + 'Start State Name: State_' + startStateDateTime.strftime('%Y_%m_%d') + '_To_' + startDateTime.strftime('%Y_%m_%d')
                     runFile.write(line4 + '\n')
 
