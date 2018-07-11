@@ -2,7 +2,7 @@ import datetime
 from flask import Flask, request, redirect, url_for, send_from_directory
 from flask_json import FlaskJSON, JsonError, json_response
 from flask_uploads import UploadSet, configure_uploads
-from hec_server.model_tasks import init_hec_hms_models
+from hec_server.model_tasks import init_hec_hms_models, run_hec_hms_model
 
 
 app = Flask(__name__)
@@ -36,6 +36,12 @@ def init_hec_hms():
 @app.route('/hec_hms/init-run', methods=['POST', 'GET'])
 def run_hec_hms():
     req_args = request.args.to_dict()
+    if 'run-name' not in req_args.keys() or not req_args['run-name']:
+        raise JsonError(status_=400, description='run-name is not specified.')
+    print("init_hec_hms...")
+    run_name = req_args['run-name']
+    run_datetime = request.args.get('datetime', default=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), type=str)
+    run_hec_hms_model(run_name, run_datetime)
     return 'Hello World'
 
 
