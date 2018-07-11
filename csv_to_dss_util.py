@@ -58,19 +58,6 @@ try:
             date = options.date
         if options.time:
             time = options.time
-        # if options.hec_hms_model_dir:
-        #     HEC_HMS_MODEL_DIR = options.hec_hms_model_dir
-        #     # Reconstruct DSS_INPUT_FILE path
-        #     dssFileName = DSS_INPUT_FILE.rsplit('/', 1)
-        #     DSS_INPUT_FILE = os.path.join(HEC_HMS_MODEL_DIR, dssFileName[-1])
-        #
-        # # Replace CONFIG.json variables
-        # if re.match('^\$\{(HEC_HMS_MODEL_DIR)\}', DSS_INPUT_FILE):
-        #     DSS_INPUT_FILE = re.sub('^\$\{(HEC_HMS_MODEL_DIR)\}', '', DSS_INPUT_FILE).strip("/\\")
-        #     DSS_INPUT_FILE = os.path.join(HEC_HMS_MODEL_DIR, DSS_INPUT_FILE)
-        #     print
-        #     '"Set DSS_INPUT_FILE=', DSS_INPUT_FILE
-
         # Default run for current day
         modelState = datetime.datetime.now()
         if date:
