@@ -113,6 +113,36 @@ def save_forecast_timeseries(adapter, time_series_data, model_date_time, opts):
                 print(sub_df)
 
 
+def save_forecast_timeseries_data(adapter, time_series_data, run_date, opts):
+    df = pd.pivot_table(time_series_data, columns=time_series_data['time'].str[:10])
+    days_list = df.columns.values
+    for day in days_list:
+        type = get_type_by_date(run_date, day)
+        sub_df = time_series_data.loc[time_series_data['time'].str[:10] == day]
+        if type != 'Error':
+            meta_data = {
+                'station': 'Hanwella',
+                'variable': 'Discharge',
+                'unit': 'm3/s',
+                'type': type,
+                'source': 'HEC-HMS',
+                'name': opts.get('run_name', 'Cloud-1'),
+            }
+            event_id = get_event_id(adapter, meta_data)
+            if event_id is None:
+                event_id = create_event_id(adapter, meta_data)
+            size = sub_df.shape[0]
+
+            def get_event_column(event_id, size, event_list=[]):
+                for i in range(0, size):
+                    event_list.append(event_id)
+                return event_list
+
+            if size > 0:
+                sub_df.insert(loc=0, column='id', value=get_event_column(event_id, size))
+                print(sub_df)
+
+
 def upload_data_to_db(run_datetime, discharge_file, run_name, force_insert=False):
     try:
         CSV_NUM_METADATA_LINES = 2
@@ -136,6 +166,35 @@ def upload_data_to_db(run_datetime, discharge_file, run_name, force_insert=False
             'runName': runName
         }
         save_forecast_timeseries(MySqlAdapter(), time_series_data, run_datetime, opts)
+
+    except Exception as e:
+        print(e)
+        traceback.print_exc()
+
+
+def upload_discharge_data(run_date, discharge_file, run_name, force_insert=False):
+    try:
+        CSV_NUM_METADATA_LINES = 2
+        DAT_WIDTH = 12
+        DISCHARGE_CSV_FILE = 'DailyDischarge.csv'
+
+        forceInsert = force_insert
+        runName = run_name
+
+        print('Open Discharge CSV ::', discharge_file)
+        time_series_data = pd.read_csv(discharge_file, names=['time', 'value'])
+
+        # Validate Discharge Timeseries
+        if not time_series_data.shape[0] > 0:
+            print('ERROR: Discharge timeseries length is zero.')
+            sys.exit(1)
+
+        # Save Forecast values into Database
+        opts = {
+            'forceInsert': forceInsert,
+            'runName': runName
+        }
+        save_forecast_timeseries(MySqlAdapter(), time_series_data, run_date, opts)
 
     except Exception as e:
         print(e)
