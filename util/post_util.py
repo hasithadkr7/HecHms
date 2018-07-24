@@ -10,3 +10,9 @@ def dss_to_csv(run_name, run_date):
     subprocess.call([dssvue_cmd], shell=True)
 
 
+def discharge_file_exists(run_name, run_date, output_path_prefix):
+    date_str = run_date.strftime("%Y-%m-%d")
+    discharge_file = os.path.join(output_path_prefix, date_str, run_name, 'output/DailyDischarge.csv')
+    os.path.isfile(discharge_file)
+
+

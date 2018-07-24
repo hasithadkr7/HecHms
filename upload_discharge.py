@@ -113,121 +113,30 @@ def save_forecast_timeseries(adapter, time_series_data, model_date_time, opts):
                 print(sub_df)
 
 
-
-try:
-    CONFIG = json.loads(open('/home/uwcc-admin/udp_150/HecHms/config.json').read())
-
-    CSV_NUM_METADATA_LINES = 2
-    DAT_WIDTH = 12
-    DISCHARGE_CSV_FILE = 'DailyDischarge.csv'
-    DISCHARGE_FILE_DIR = '/HecHms/Discharge'
-
-    MYSQL_HOST = "localhost"
-    MYSQL_USER = "root"
-    MYSQL_DB = "curw"
-    MYSQL_PASSWORD = ""
-
-    if 'DISCHARGE_CSV_FILE' in CONFIG:
-        DISCHARGE_CSV_FILE = CONFIG['DISCHARGE_CSV_FILE']
-    if 'DISCHARGE_FILE_DIR' in CONFIG:
-        DISCHARGE_FILE_DIR = CONFIG['DISCHARGE_FILE_DIR']
-    if 'OUTPUT_DIR' in CONFIG:
-        OUTPUT_DIR = CONFIG['OUTPUT_DIR']
-    if 'MYSQL_HOST' in CONFIG:
-        MYSQL_HOST = CONFIG['MYSQL_HOST']
-    if 'MYSQL_USER' in CONFIG:
-        MYSQL_USER = CONFIG['MYSQL_USER']
-    if 'MYSQL_DB' in CONFIG:
-        MYSQL_DB = CONFIG['MYSQL_DB']
-    if 'MYSQL_PASSWORD' in CONFIG:
-        MYSQL_PASSWORD = CONFIG['MYSQL_PASSWORD']
-
-    date = '2018-05-30'
-    time = '13:00:00'
-    startDate = ''
-    startTime = ''
-    tag = ''
-    forceInsert = False
-    runName = 'hec_hms'
+def upload_data_to_db(run_datetime, discharge_file, run_name, force_insert=False):
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hd:t:T:fn:", [
-            "help", "date=", "time=", "start-date=", "start-time=", "tag=", "force", "runName="
-        ])
-    except getopt.GetoptError:
-        usage()
-        sys.exit(2)
-    for opt, arg in opts:
-        if opt in ("-h", "--help"):
-            usage()
-            sys.exit(0)
-        elif opt in ("-d", "--date"):
-            date = arg
-        elif opt in ("-t", "--time"):
-            time = arg
-        elif opt in ("--start-date"):
-            startDate = arg
-        elif opt in ("--start-time"):
-            startTime = arg
-        elif opt in ("-T", "--tag"):
-            tag = arg
-        elif opt in ("-f", "--force"):
-            forceInsert = True
-        elif opt in ("-n", "--name"):
-            runName = arg
+        CSV_NUM_METADATA_LINES = 2
+        DAT_WIDTH = 12
+        DISCHARGE_CSV_FILE = 'DailyDischarge.csv'
 
-    # FLO-2D parameters
-    IHOURDAILY = 0  # 0-hourly interval, 1-daily interval
-    IDEPLT = 0  # Set to 0 on running with Text mode. Otherwise cell number e.g. 8672
-    IFC = 'C'  # foodplain 'F' or a channel 'C'
-    INOUTFC = 0  # 0-inflow, 1-outflow
-    KHIN = 8655  # inflow nodes
-    HYDCHAR = 'H'  # Denote line of inflow hydrograph time and discharge pairs
+        forceInsert = force_insert
+        runName = run_name
 
-    # Default run for current day
-    modelState = datetime.datetime.now()
-    if date:
-        modelState = datetime.datetime.strptime(date, '%Y-%m-%d')
-    date = modelState.strftime("%Y-%m-%d")
-    if time:
-        modelState = datetime.datetime.strptime('%s %s' % (date, time), '%Y-%m-%d %H:%M:%S')
-    time = modelState.strftime("%H:%M:%S")
+        print('Open Discharge CSV ::', discharge_file)
+        time_series_data = pd.read_csv(discharge_file, names=['time', 'value'])
 
-    startDateTime = datetime.datetime.now()
-    if startDate:
-        startDateTime = datetime.datetime.strptime(startDate, '%Y-%m-%d')
-    else:
-        startDateTime = datetime.datetime.strptime(date, '%Y-%m-%d')
-    startDate = startDateTime.strftime("%Y-%m-%d")
+        # Validate Discharge Timeseries
+        if not time_series_data.shape[0] > 0:
+            print('ERROR: Discharge timeseries length is zero.')
+            sys.exit(1)
 
-    if startTime:
-        startDateTime = datetime.datetime.strptime('%s %s' % (startDate, startTime), '%Y-%m-%d %H:%M:%S')
-    startTime = startDateTime.strftime("%H:%M:%S")
+        # Save Forecast values into Database
+        opts = {
+            'forceInsert': forceInsert,
+            'runName': runName
+        }
+        save_forecast_timeseries(MySqlAdapter(), time_series_data, run_datetime, opts)
 
-    print('CSVTODAT startTime:', datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), tag)
-    print(' CSVTODAT run for', date, '@', time, tag)
-    print(' With Custom starting', startDate, '@', startTime, ' run name:', runName)
-
-    model_date_time = datetime.datetime.strptime('%s %s' % (date, time), '%Y-%m-%d %H:%M:%S')
-
-    output_file_dir = os.path.join(DISCHARGE_FILE_DIR, model_date_time.strftime("%Y-%m-%d_%H:%M:%S"))
-    print("output file dir : ", output_file_dir)
-
-    DISCHARGE_CSV_FILE_PATH = os.path.join(output_file_dir, DISCHARGE_CSV_FILE)
-    print('Open Discharge CSV ::', DISCHARGE_CSV_FILE_PATH)
-    time_series_data = pd.read_csv(DISCHARGE_CSV_FILE_PATH, names=['time', 'value'])
-
-    # Validate Discharge Timeseries
-    if not time_series_data.shape[0] > 0:
-        print('ERROR: Discharge timeseries length is zero.')
-        sys.exit(1)
-
-    # Save Forecast values into Database
-    opts = {
-        'forceInsert': forceInsert,
-        'runName': runName
-    }
-    save_forecast_timeseries(MySqlAdapter(), time_series_data, model_date_time, opts)
-
-except Exception as e:
-    print(e)
-    traceback.print_exc()
+    except Exception as e:
+        print(e)
+        traceback.print_exc()

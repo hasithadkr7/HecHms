@@ -60,7 +60,6 @@ def update_model_configs(control_file, run_file, gage_file, rainfall_file, init_
         #model_date_time = datetime.datetime.strptime('%s %s' % (date, time), '%Y-%m-%d %H:%M:%S')
 
         print('Update_HECHMS startTime:', datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-
         rainfall_df = pd.read_csv(rainfall_file)
         startDateTime = datetime.datetime.strptime(rainfall_df.values[0].tolist()[0], '%Y-%m-%d %H:%M:%S')
         endDateTime = datetime.datetime.strptime(rainfall_df.values[-1].tolist()[0], '%Y-%m-%d %H:%M:%S')

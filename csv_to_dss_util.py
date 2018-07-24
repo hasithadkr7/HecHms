@@ -43,7 +43,7 @@ try:
         if options.model_dir:
             HEC_HMS_MODEL_DIR = options.model_dir
 
-        DSS_INPUT_FILE = os.path.join(run_date, run_name, 'model/2008_2_Events_input.dss')
+        DSS_INPUT_FILE = os.path.join(run_date, run_name, '2008_2_Events_input.dss')
         myDss = HecDss.open(DSS_INPUT_FILE)
 
         RAIN_CSV_FILE_PATH = os.path.join(run_date, run_name, 'input/DailyRain.csv')
