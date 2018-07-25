@@ -1,7 +1,7 @@
 import os
 import subprocess
 from distutils.dir_util import copy_tree
-import zipfile
+from shutil import make_archive
 
 
 def dss_to_csv(run_name, run_date):
@@ -40,11 +40,18 @@ def zipdir(path, ziph):
             ziph.write(os.path.join(root, file))
 
 
-def create_output_zip(zip_file_name, location):
-    zipf = zipfile.ZipFile(zip_file_name, 'w', zipfile.ZIP_DEFLATED)
-    zipdir(location, zipf)
-    zipf.close()
+def create_output_zip(zip_file_name, input_file_path, output_file_path):
+    output_zip = zip_file_name + '.zip'
+    output_zip_abs_path = os.path.join(output_file_path, output_zip)
 
+    # Check whether output.zip is already created.
+    if os.path.exists(output_zip_abs_path):
+        return output_zip
+
+    # Check whether the output is ready. If ready archive and return the .zip, otherwise return None.
+    if os.path.exists(output_file_path):
+        make_archive(input_file_path, 'zip', output_file_path)
+        return output_zip
 
 
 

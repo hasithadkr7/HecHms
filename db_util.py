@@ -62,6 +62,7 @@ def save_time_series_values(self, data_frame):
     except Exception:
         traceback.print_exc()
 
+
 def get_event_id(self, meta_data):
     event_id = None
     m = hashlib.sha256()
@@ -166,3 +167,21 @@ def get_type_by_date(run_date, ts_date):
     else:
         return 'Error'
 
+
+def save_init_state(self, date, init_data):
+    try:
+        sql = 'UPDATE tbl_hec_init SET file = {} WHERE date  = \'{}\' '.format(init_data, date)
+        self.engine.connect().excute(sql)
+    except Exception as e:
+        print('save_init_state|Exception:', e)
+
+
+def get_init_state(self, date):
+    try:
+        sql = 'select file from tbl_hec_init WHERE date  = \'{}\' '.format(date)
+        result = self.engine.connect().excute(sql)
+        for init_data in result:
+            return init_data
+    except Exception as e:
+        print('get_init_state|Exception:', e)
+        return None

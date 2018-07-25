@@ -1,5 +1,5 @@
 import datetime
-from flask import Flask, request, redirect, url_for, send_from_directory
+from flask import Flask, request, send_from_directory
 from flask_json import FlaskJSON, JsonError, json_response
 from flask_uploads import UploadSet, configure_uploads
 from model_tasks import init_single, upload_discharge
@@ -8,6 +8,7 @@ import ast
 from util.pre_util import validate_run_id
 from util.run_util import run_hec_model
 from util.post_util import convert_dss_to_csv, exists_discharge_file, copy_input_file_to_output, create_output_zip
+from util.gen_util import is_init_state, save_init_state
 
 
 app = Flask(__name__)
@@ -33,14 +34,19 @@ def init_hec_hms_single():
     req_args = request.args.to_dict()
     if 'run-name' not in req_args.keys() or not req_args['run-name']:
         raise JsonError(status_=400, description='run-name is not specified.')
-    if 'run-datetime' not in req_args.keys() or not req_args['run-datetime']:
-        raise JsonError(status_=400, description='run-datetime is not specified.')
-    if 'init-state' not in req_args.keys() or not req_args['init-state']:
-        raise JsonError(status_=400, description='init-state is not specified.')
-    init_state = ast.literal_eval(request.args.get('init-state', type=str))
     run_name = request.args.get('run-name', type=str)
     # Model running date default is current date. Folder created for this date.
+    if 'run-datetime' not in req_args.keys() or not req_args['run-datetime']:
+        raise JsonError(status_=400, description='run-datetime is not specified.')
     run_datetime = datetime.datetime.strptime(request.args.get('run-datetime', type=str), '%Y-%m-%d %H:%M:%S')
+    if 'init-state' not in req_args.keys() or not req_args['init-state']:
+        init_state_path = path.join(UPLOADS_DEFAULT_DEST,
+                                    run_datetime.strftime('%Y-%m-%d'),
+                                    run_name,
+                                    '2008_2_Events/basinStates')
+        init_state = is_init_state(run_datetime.strftime('%Y-%m-%d'), init_state_path)
+    else:
+        init_state = ast.literal_eval(request.args.get('init-state', type=str))
     input_dir_rel_path = path.join(run_datetime.strftime('%Y-%m-%d'), run_name, 'input')
     # Check whether the given run-name is already taken for today.
     input_dir_abs_path = path.join(UPLOADS_DEFAULT_DEST, input_dir_rel_path)
@@ -54,7 +60,7 @@ def init_hec_hms_single():
         # TODO save run_id in a DB with the status
         return json_response(status_=200, run_id=run_id, description='Successfully saved files.')
     else:
-        raise JsonError(status_=400,description='No required input files found, Rainfall file missing in request.')
+        raise JsonError(status_=400, description='No required input files found, Rainfall file missing in request.')
 
 
 # Gathering required input files to run distributed hec-hms model
@@ -97,6 +103,11 @@ def run_hec_hms():
         run_name = run_id.split(':')[3]
         run_hec_model(run_name, run_date)
         convert_dss_to_csv(run_name, run_date)
+        init_state_path = path.join(UPLOADS_DEFAULT_DEST,
+                                    run_date,
+                                    run_name,
+                                    '2008_2_Events/basinStates')
+        save_init_state(run_date, init_state_path)
         return json_response(status_=200, run_id=run_id, description='Successfully run Hec-Hms.')
     else:
         raise JsonError(status_=400, description='Invalid run id.')
@@ -112,14 +123,15 @@ def upload_data():
     if 'zip-file-name' not in req_args.keys() or not req_args['zip-file-name']:
         raise JsonError(status_=400, description='zip-file-name is not specified.')
     run_id = request.args.get('run-id', type=str)
-    zip_file_name = request.args.get('zip-file-name', type=str)
+    zip_file_name = request.args.get('zip-file-name', type=str) # without zip extension.
     if validate_run_id(run_id):
         run_date = run_id.split(':')[2]
         run_name = run_id.split(':')[3]
         input_file_path = path.join(UPLOADS_DEFAULT_DEST, run_date, run_name, 'input')
         output_file_path = path.join(UPLOADS_DEFAULT_DEST, run_date, run_name, 'output')
         copy_input_file_to_output(input_file_path, output_file_path)
-        create_output_zip(zip_file_name, output_file_path)
+        output_zip = create_output_zip(zip_file_name, output_file_path, output_file_path)
+        return send_from_directory(directory=path.join(UPLOADS_DEFAULT_DEST,' OUTPUT'), filename=output_zip)
     else:
         raise JsonError(status_=400, description='Invalid run id.')
 
