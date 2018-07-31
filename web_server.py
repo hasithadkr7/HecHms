@@ -5,6 +5,7 @@ from flask_uploads import UploadSet, configure_uploads
 from model_tasks import init_hec_hms_models, run_hec_hms_model, post_model, discharge_file_exists, upload_discharge_data_to_db, init_hec_hms_models_rf_gen
 from os import path
 import ast
+from werkzeug.utils import secure_filename
 
 
 app = Flask(__name__)
@@ -54,7 +55,7 @@ def init_hec_hms_single():
         model_hec.save(req_files['rainfall'], folder=input_dir_rel_path, name='DailyRain.csv')
         init_hec_hms_models(run_name, run_datetime_str, init_state, 'single')
     elif ('forward' in req_args.keys() or req_args['forward']) and ('backward' in req_args.keys() or req_args['backward']):
-        backward = request.args.get('datetime', default=2, type=int)
+        backward = request.args.get('datetime', default=2, tterype=int)
         forward = request.args.get('datetime', default=3, type=int)
         init_hec_hms_models_rf_gen(run_name, run_datetime_str, init_state, backward, forward)
     else:
@@ -70,9 +71,18 @@ def init_hec_hms_distributed():
     if 'run-name' not in req_args.keys() or not req_args['run-name']:
         raise JsonError(status_=400, description='run-name is not specified.')
     run_name = req_args['run-name']
-    run_datetime = request.args.get('datetime', default=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), type=str)
-    init_state = request.args.get('init-state', default=False, type=bool)
-    init_hec_hms_models(run_name, run_datetime, init_state, 'distributed')
+    run_datetime_str = request.args.get('datetime', default=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                                        type=str)
+    run_datetime = datetime.datetime.strptime(run_datetime_str, '%Y-%m-%d %H:%M:%S')
+
+    input_dir_rel_path = path.join(run_datetime.strftime('%Y-%m-%d'), run_name, 'input')
+    input_dir_abs_path = path.join(UPLOADS_DEFAULT_DEST, input_dir_rel_path)
+    if path.exists(input_dir_abs_path):
+        raise JsonError(status_=400,
+                        description='run-name: %s is already taken for run date: %s.' % (run_name, run_datetime))
+    for f in request.files.getlist('rainfall'):
+        filename = secure_filename(f.filename)
+        f.save(path.join(input_dir_rel_path, filename))
     return json_response(status_=200, description='Successfully saved files.')
 
 

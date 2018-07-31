@@ -9,6 +9,7 @@ from util.pre_util import validate_run_id
 from util.run_util import run_hec_model
 from util.post_util import convert_dss_to_csv, exists_discharge_file, copy_input_file_to_output, create_output_zip
 from util.gen_util import is_init_state, save_init_state
+from werkzeug.utils import secure_filename
 
 
 app = Flask(__name__)
@@ -66,28 +67,23 @@ def init_hec_hms_single():
 # Gathering required input files to run distributed hec-hms model
 @app.route('/hec_hms/distributed/init-start', methods=['POST'])
 def init_hec_hms_distributed():
-    print('init_hec_hms_distributed')
     req_args = request.args.to_dict()
+    # check whether run-name is specified and valid.
     if 'run-name' not in req_args.keys() or not req_args['run-name']:
         raise JsonError(status_=400, description='run-name is not specified.')
-    if 'run-datetime' not in req_args.keys() or not req_args['run-datetime']:
-        raise JsonError(status_=400, description='run-datetime is not specified.')
-    if 'model-datetime' not in req_args.keys() or not req_args['model-datetime']:
-        raise JsonError(status_=400, description='model-datetime is not specified.')
-    if 'init-state' not in req_args.keys() or not req_args['init-state']:
-        raise JsonError(status_=400, description='init-state is not specified.')
-    init_state = ast.literal_eval(request.args.get('init-state', type=str))
-    run_name = request.args.get('run-name', type=str)
-    # Model running date default is current date. Folder created for this date.
-    run_datetime = datetime.datetime.strptime(request.args.get('run-datetime', type=str), '%Y-%m-%d %H:%M:%S')
-    # Model state date time. Which can be a past date or current date.
-    model_datetime = datetime.datetime.strptime(request.args.get('model-datetime', type=str), '%Y-%m-%d %H:%M:%S')
+    run_name = req_args['run-name']
+    run_datetime_str = request.args.get('datetime', default=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                                        type=str)
+    run_datetime = datetime.datetime.strptime(run_datetime_str, '%Y-%m-%d %H:%M:%S')
+
     input_dir_rel_path = path.join(run_datetime.strftime('%Y-%m-%d'), run_name, 'input')
-    # Check whether the given run-name is already taken for today.
     input_dir_abs_path = path.join(UPLOADS_DEFAULT_DEST, input_dir_rel_path)
     if path.exists(input_dir_abs_path):
         raise JsonError(status_=400,
                         description='run-name: %s is already taken for run date: %s.' % (run_name, run_datetime))
+    for f in request.files.getlist('rainfall'):
+        filename = secure_filename(f.filename)
+        f.save(path.join(input_dir_rel_path, filename))
 
 
 # Running hec-hms

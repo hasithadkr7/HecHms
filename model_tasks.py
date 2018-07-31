@@ -1,6 +1,6 @@
 import datetime
 import os
-from util.pre_util import copy_model_files, generate_rainfall, update_model_files, update_model, csv_to_dss
+from util.pre_util import copy_model_files, generate_rainfall, update_model_files, update_model, csv_to_dss, copy_distributed_model_files, update_distributed_model_files
 from util.post_util import dss_to_csv
 from util.post_util import discharge_file_exists
 from util.run_util import run_model
@@ -32,8 +32,10 @@ def init_single(run_name, folder_date, init_state):
     csv_to_dss(run_name, folder_date)
 
 
-def init_distributed(run_name, run_date):
-    print('')
+def init_distributed(run_name, folder_date, init_state):
+    print('init_distributed')
+    copy_distributed_model_files(run_name, folder_date)
+    update_distributed_model_files(run_name, folder_date, init_state)
 
 
 def run_hec_hms_model(run_name, run_datetime):

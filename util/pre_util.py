@@ -1,14 +1,26 @@
 import os
+import glob
 import subprocess
 from distutils.dir_util import copy_tree
 from get_rain_fall import generate_rf_file
 from model_update_util import update_model_configs, update_model_script
+from distributed_model_update_util import update_distributed_model_configs, update_distributed_model_script
 
 
 def copy_model_files(run_name, folder_date):
     print("copy_model_files")
     model_path = os.path.join(folder_date, run_name, '2008_2_Events')
     base_model_path = os.path.join('2008_2_Events_Hack')
+    if not os.path.exists(model_path):
+        os.makedirs(model_path)
+    print(model_path)
+    copy_tree(base_model_path, model_path)
+
+
+def copy_distributed_model_files(run_name, folder_date):
+    print("copy_model_files")
+    model_path = os.path.join(folder_date, run_name, '2008_2_Events')
+    base_model_path = os.path.join('2008_2_Events_Distributed')
     if not os.path.exists(model_path):
         os.makedirs(model_path)
     print(model_path)
@@ -30,6 +42,17 @@ def update_model_files(run_name, folder_date, init_state):
     gage_file = os.path.join(folder_date, run_name, '2008_2_Events/2008_2_Events.gage')
     rainfall_file = os.path.join(folder_date, run_name, 'input/DailyRain.csv')
     update_model_configs(control_file, run_file, gage_file, rainfall_file, init_state)
+
+
+def update_distributed_model_files(run_name, folder_date, init_state):
+    control_file = os.path.join(folder_date, run_name, '2008_2_Events/Control_1.control')
+    run_file = os.path.join(folder_date, run_name, '2008_2_Events/2008_2_Events.run')
+    gage_file = os.path.join(folder_date, run_name, '2008_2_Events/2008_2_Events.gage')
+    rf_dir_path = os.path.join(folder_date, run_name, 'input')
+    rf_files = glob.glob(rf_dir_path+'/*_DailyRain.csv')
+    print(rf_files)
+    rainfall_file = rf_files[0]
+    update_distributed_model_configs(control_file, run_file, gage_file, rainfall_file, init_state)
 
 
 def update_model(run_name, folder_date):
