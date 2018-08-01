@@ -1,0 +1,14 @@
+Metadata-Version: 1.1
+Name: tk64
+Version: 0.1
+Summary: Token encoding and decoding for 64 bit integers
+Home-page: https://github.com/meantheory/tk64
+Author: Jeremiah Campbell
+Author-email: jeremy@meantheory.com
+License: MIT
+Download-URL: https://github.com/meantheory/tk64/tarball/0.1
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 2.7
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Development Status :: 4 - Beta

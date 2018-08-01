@@ -1,0 +1,7 @@
+[console_scripts]
+decrypt = pyquickhelper.cli.encryption_cli:decrypt
+decrypt_file = pyquickhelper.cli.encryption_file_cli:decrypt_file
+encrypt = pyquickhelper.cli.encryption_cli:encrypt
+encrypt_file = pyquickhelper.cli.encryption_file_cli:encrypt_file
+pyq-sync = pyquickhelper.cli.pyq_sync_cli:pyq_sync
+

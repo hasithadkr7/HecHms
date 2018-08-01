@@ -1,0 +1,15 @@
+Metadata-Version: 2.1
+Name: jupyter-sphinx
+Version: 0.1.3
+Summary: Jupyter Sphinx Extensions
+Home-page: UNKNOWN
+Author: Jupyter Development Team
+Author-email: jupyter@googlegroups.com
+License: BSD
+Platform: UNKNOWN
+Requires-Dist: Sphinx (>=0.6)
+Requires-Dist: ipywidgets (>=6.0.0)
+
+UNKNOWN
+
+

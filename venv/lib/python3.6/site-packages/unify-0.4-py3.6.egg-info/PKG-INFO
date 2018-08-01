@@ -1,0 +1,48 @@
+Metadata-Version: 1.1
+Name: unify
+Version: 0.4
+Summary: Modifies strings to all use the same (single/double) quote where possible.
+Home-page: https://github.com/myint/unify
+Author: Steven Myint
+Author-email: UNKNOWN
+License: Expat License
+Description: =====
+        unify
+        =====
+        
+        .. image:: https://travis-ci.org/myint/unify.svg?branch=master
+            :target: https://travis-ci.org/myint/unify
+            :alt: Build status
+        
+        Modifies strings to all use the same quote where possible.
+        
+        
+        Example
+        =======
+        
+        After running::
+        
+            $ unify --in-place example.py
+        
+        this code
+        
+        .. code-block:: python
+        
+            x = "abc"
+            y = 'hello'
+        
+        gets formatted into this
+        
+        .. code-block:: python
+        
+            x = 'abc'
+            y = 'hello'
+        
+Keywords: strings,formatter,style
+Platform: UNKNOWN
+Classifier: Intended Audience :: Developers
+Classifier: Environment :: Console
+Classifier: Programming Language :: Python :: 2.6
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License

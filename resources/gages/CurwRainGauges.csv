@@ -1,0 +1,45 @@
+id,stationId,name,control,status,latitude,longitude,resolution,description
+100001,curw_attanagalla,Attanagalla,virtual,n/a,7.111666667,80.14983333,0,NULL
+100002,curw_colombo,Colombo,virtual,n/a,6.898158,79.8653,0,NULL
+100003,curw_daraniyagala,Daraniyagala,virtual,n/a,6.924444444,80.33805556,0,NULL
+100004,curw_glencourse,Glencourse,virtual,n/a,6.978055556,80.20305556,0,NULL
+100005,curw_hanwella,Hanwella,virtual,n/a,6.909722222,80.08166667,0,NULL
+100006,curw_holombuwa,Holombuwa,virtual,n/a,7.185166667,80.26480556,0,NULL
+100007,curw_kitulgala,Kitulgala,virtual,n/a,6.989166667,80.41777778,0,NULL
+100008,curw_norwood,Norwood,virtual,n/a,6.835638889,80.61466667,0,NULL
+100009,curw_kalutara,Kalutara,virtual,n/a,6.6,79.95,0,NULL
+100010,curw_kalawana,Kalawana,virtual,n/a,6.54,80.38,0,NULL
+100011,curw_ratnapura,Ratnapura,virtual,n/a,6.72,80.38,0,NULL
+100012,curw_kahawatta,Kahawatta,virtual,n/a,6.6,80.58,0,NULL
+100013,curw_dodampe,Dodampe,virtual,n/a,6.72712,80.3274,0,NULL
+100021,curw_iBATTARA3,IBATTARA3,virtual,n/a,6.89,79.860003,0,NULL
+100022,curw_iBATTARA4,IBATTARA4,virtual,n/a,6.89,79.860004,0,NULL
+100023,curw_isurupaya,Isurupaya,virtual,n/a,6.89,79.92,0,NULL
+100024,curw_borella,Borella,virtual,n/a,6.93,79.86,0,NULL
+100025,curw_kompannaveediya,Kompannaveediya,virtual,n/a,6.92,79.85,0,NULL
+100026,curw_angurukaramulla,Angurukaramulla,virtual,n/a,7.21,79.86,0,NULL
+100027,curw_hirimbure,Hirimbure,virtual,n/a,6.054,80.221,0,NULL
+100028,curw_yatiwawala,Yatiwawala,virtual,n/a,7.329,80.613,0,NULL
+100034,curw_kub_obs,KUB Obs,virtual,n/a,7.111666667,80.14983333,0,Kelani Upper Basin Observation
+100035,curw_klb_obs,KLB Obs,virtual,n/a,7.111666667,80.14983333,0,Kelani Lower Basin Observation
+100037,curw_hingurana,Hingurana,virtual,n/a,6.904552,80.407895,0,Hingurana Station
+100038,curw_orugodawatta,Orugodawatta,virtual,n/a,6.943741,79.87887,0,SLLRDC Colombo North Office
+100039,curw_mahapallegama,Mahapallegama,virtual,n/a,7.169737,80.258512,0,Mahapallegama station with standard Gauge
+100040,curw_jaffna,Jaffna,virtual,n/a,9.6607949,80.0298459,0,District Secretariat Office Jaffna
+100041,curw_uduwawala,Uduwawala,virtual,n/a,7.329,80.613,0,Uduwawala Station
+100042,curw_kottawa_dharmapala_north,Kottawa North Dharmapala School,virtual,n/a,6.865576,79.958181,0,Kottawa North Dharmapala School
+100043,curw_IBATTARA2,IBATTARA2,virtual,n/a,6.908,79.919,0,Battaramulla
+100044,curw_ambatale,Ambatale,virtual,n/a,6.935762,79.947458,0,Ambatale station with standard Gauge
+100045,curw_waga,Waga,virtual,n/a,6.90678,80.118275,0,Waga Station
+100046,curw_ambewela,Ambewela Farm,virtual,n/a,6.890585,80.802551,0,"A&T Communication Box, Texas Standard Rain Gauge"
+100056,curw_kotikawatta,Kotikawatta,virtual,n/a,6.890585,80.802551,0,"A&T Communication Box, Texas Standard Rain Gauge"
+100057,curw_mulleriyawa,Mulleriyawa,virtual,n/a,6.923571,79.941176,0,"A&T Communication Box, Texas Standard Rain Gauge"
+100058,curw_thurstan_college,Thurstan College,virtual,n/a,6.90293,79.85932,0,Leecom station with their own Rain Gauge
+100059,curw_malabe,Malabe,virtual,n/a,6.90396,79.95738,0,"A&T Communication Box, Texas Standard Rain Gauge"
+100060,curw_dickoya,Dickoya,virtual,n/a,6.8722,80.60312,0,"A&T Communication Box, Texas Standard Rain Gauge"
+100061,curw_mutwal,Mutwal,virtual,n/a,6.95871,79.8609,0,"A&T Communication Box, Texas Standard Rain Gauge"
+100062,curw_norton_bridge,Norton Bridge,virtual,n/a,6.9,80.516,0,
+100063,curw_urumewella,Urumewella,virtual,n/a,7.079348,80.348785,0,"A&T Communication Box, Texas Standard Rain Gauge"
+100064,curw_kohuwala,Kohuwala,virtual,n/a,6.860887,79.885825,0,"Raspberrypi Communication Box, Davis Standard Rain Gauge"
+100065,curw_wl_test,Leecom WL Guage,virtual,n/a,6.890585,80.802551,0,"Leecom water level guage, testing station"
+100066,curw_wl_janakalakendraya,Janakala Kendraya,virtual,n/a,6.892276,79.921876,0,"Leecom water level guage, Leecom communication box"

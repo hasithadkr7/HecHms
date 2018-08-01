@@ -1,0 +1,3 @@
+[console_scripts]
+unify = unify:main
+

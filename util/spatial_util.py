@@ -7,7 +7,7 @@ import geopandas as gpd
 
 from scipy.spatial import Voronoi
 from shapely.geometry import Polygon, Point
-from util.manager_util import get_resource_path as res_mgr
+from resources import manager as res_mgr
 
 
 def _voronoi_finite_polygons_2d(vor, radius=None):
@@ -116,8 +116,8 @@ def get_voronoi_polygons(points_dict, shape_file, shape_attribute=None, output_s
 
     ids = [p if type(p) == str else np.asscalar(p) for p in points_dict.keys()]
     points = np.array(list(points_dict.values()))[:, :2]
-
     vor = Voronoi(points)
+
     regions, vertices = _voronoi_finite_polygons_2d(vor)
 
     data = []
@@ -128,9 +128,9 @@ def get_voronoi_polygons(points_dict, shape_file, shape_attribute=None, output_s
             data.append({'id': ids[i], 'lon': vor.points[i][0], 'lat': vor.points[i][1], 'area': intersection.area,
                          'geometry': intersection
                          })
-    if add_total_area:
-        data.append({'id': '__total_area__', 'lon': shape_polygon.centroid.x, 'lat': shape_polygon.centroid.y,
-                     'area': shape_polygon.area, 'geometry': shape_polygon})
+    # if add_total_area:
+    #     data.append({'id': '__total_area__', 'lon': shape_polygon.centroid.x, 'lat': shape_polygon.centroid.y,
+    #                  'area': shape_polygon.area, 'geometry': shape_polygon})
 
     df = gpd.GeoDataFrame(data, columns=['id', 'lon', 'lat', 'area', 'geometry'], crs=shape_df.crs)
 

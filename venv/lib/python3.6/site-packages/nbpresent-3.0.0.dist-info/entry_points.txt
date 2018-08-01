@@ -1,0 +1,3 @@
+[console_scripts]
+nbpresent = nbpresent.export:main
+

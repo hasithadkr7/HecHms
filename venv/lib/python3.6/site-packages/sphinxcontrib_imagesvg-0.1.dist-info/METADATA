@@ -1,0 +1,27 @@
+Metadata-Version: 2.0
+Name: sphinxcontrib-imagesvg
+Version: 0.1
+Summary: Sphinx "imagesvg" extension
+Home-page: http://bitbucket.org/birkenfeld/sphinx-contrib
+Author: Theo J.A. de Vries
+Author-email: t.j.a.devries@gmail.com
+License: BSD
+Download-URL: http://pypi.python.org/pypi/sphinxcontrib-imagesvg
+Platform: any
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Environment :: Web Environment
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Topic :: Documentation
+Classifier: Topic :: Utilities
+Requires-Dist: Sphinx (>=0.6)
+Requires-Dist: setuptools
+
+
+This package contains the imagesvg Sphinx extension.
+The extension defines a directive, "imagesvg", for embedding an svg image in a specified HTML tag.
+
+
