@@ -2,12 +2,16 @@ from resources import manager as res_mgr
 from util.spatial_util import get_voronoi_polygons
 import pandas as pd
 import os
+import copy
 import datetime
 import numpy as np
 import geopandas as gpd
 from scipy.spatial import Voronoi
+from station_metadata import meta_data
+from db_util import get_event_id, get_time_series_values
 
 PROJECT_PATH = '/home/hasitha/QGis/output'
+DECIMAL_POINTS = 4
 
 
 def _voronoi_finite_polygons_2d(vor, radius=None):
@@ -123,6 +127,7 @@ def get_catchment_area(catchment_file):
 
 
 def calculate_intersection(thessian_df, catchment_df):
+    sub_ratios = []
     for i, catchment_polygon in enumerate(catchment_df['geometry']):
         sub_catchment_name = catchment_df.iloc[i]['Name_of_Su']
         ratio_list = []
@@ -130,13 +135,28 @@ def calculate_intersection(thessian_df, catchment_df):
             if catchment_polygon.intersects(thessian_polygon):
                 gage_name = thessian_df.iloc[j]['id']
                 intersection = catchment_polygon.intersection(thessian_polygon)
-                ratio = np.round(intersection.area / thessian_polygon.area, 4)
+                ratio = np.round(intersection.area / thessian_polygon.area, DECIMAL_POINTS)
                 ratio_dic = {'gage_name': gage_name, 'ratio': ratio}
                 ratio_list.append(ratio_dic)
-        print('')
-        sub_dic = {'sub_catchment_name': sub_catchment_name, 'ratios': ratio_list}
-        print(sub_dic)
+        #print('')
+        sub_dict = {'sub_catchment_name': sub_catchment_name, 'ratios': ratio_list}
+        sub_ratios.append(sub_dict)
+        #print(sub_dict)
+    return sub_ratios
 
+
+# {'sub_catchment_name': 'SB-6', 'ratios': [{'gage_name': 'Hanwella', 'ratio': 0.0877}]}
+def get_sub_catchment_rainfall(data_from, data_to, db_adapter, sub_dict, station_metadata=meta_data):
+    stations_meta = copy.deepcopy(station_metadata)
+    sub_catchment_name = sub_dict['sub_catchment_name']
+    ratio_list = sub_dict['ratios']
+    for gage_dict in ratio_list:
+        gage_name = gage_dict['gage_name']
+        timeseries_meta = stations_meta[gage_name]
+        event_id = get_event_id(db_adapter, timeseries_meta)
+        time_series_df = get_time_series_values(db_adapter, event_id, data_from, data_to)
+        ratio = gage_dict['ratio']
+        time_series_df.loc[:, 'values'] *= ratio
 
 try:
     kub_points = {
@@ -157,7 +177,8 @@ try:
     catchment_file = 'kub/sub_catchments/sub_catchments1.shp'
     thessian_df = get_thessian_polygon_from_gage_points(shape_file, kub_points)
     catchment_df = get_catchment_area(catchment_file)
-    calculate_intersection(thessian_df, catchment_df)
+    sub_ratios = calculate_intersection(thessian_df, catchment_df)
+    print(sub_ratios)
 except Exception as e:
     print("get_thessian_polygon_from_gage_points|Exception|e : ", e)
 
